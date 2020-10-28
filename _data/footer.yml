@@ -10,7 +10,7 @@ display_contact_details: true
 # These links are displayed at the very bottom of the footer.
 company_links:
   - name: Legal
-    url: https://www.linaro.org/legal/
+    url: /legal/
   - name: Cookies
     url: /cookies/
   - name: Contact

@@ -1,0 +1,30 @@
+<div class="container text-center">
+    <div class="col col-12 col-sm-8 offset-sm-2 py-4 text-center">
+       <h1 class="bg-white text-dark rounded p-5">{{page.jumbotron.header_title}}</h1>
+    </div>
+    <div class="col col-12 no-padding">
+        <div class="row">
+            <div class="col col-12 col-sm-6 my-3">
+                <div class="card h-100 my-2 border-0">
+                    {% picture card_block_image {{page.jumbotron.first_section.image}} --alt {{page.jumbotron.first_section.image_alt}} %}
+                    <!-- <img class="card-img-top lazyload" src="{{page.jumbotron.first_section.image}}" alt="{{page.jumbotron.first_section.image_alt}}"> -->
+                    <div class="card-body">
+                      <div class="card-text blockquote">
+                        {{page.jumbotron.first_section.text | markdownify }}
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            <div class="col col-12 col-sm-6 my-3">
+                <div class="card h-100 my-2 border-0">
+                    {% picture card_block_image {{page.jumbotron.second_section.image}} --alt {{page.jumbotron.second_section.image_alt}} %}
+                    <div class="card-body">
+                        <div class="card-text blockquote">
+                        {{page.jumbotron.second_section.text | markdownify }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
