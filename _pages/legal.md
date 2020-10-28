@@ -34,7 +34,7 @@ flow:
 
               ## Accessing the Website
 
-              Access to the Website is permitted on a temporary basis, and We reserve the right to withdraw or amend the information We provide on the Website without notice. We will not be liable if for any reason the Website is unavailable at any time or for any period. From time to time, We may restrict access to some parts of the Website, or the entire Website, to users who have registered with us.
+              Access to the Website is permitted on a temporary basis, and we reserve the right to withdraw or amend the information We provide on the Website without notice. We will not be liable if for any reason the Website is unavailable at any time or for any period. From time to time, we may restrict access to some parts of the Website, or the entire Website, to users who have registered with us.
 
               Your access to the Website must comply with all applicable laws, regulations and ordinances, including any laws regarding the export of data or software.
 
