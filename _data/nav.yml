@@ -15,8 +15,8 @@ pages:
         url: https://linux.morello-project.org/
       - text: Linux SDK
         url: https://sdk.morello-project.org/
-  - title: CHERI OS-feature matrix
-    url: /cheri-feature-matrix/
+  - title: Operating Systems
+    url: /operating-systems/
   - title: Resources
     url: /resources/
   - title: Contact

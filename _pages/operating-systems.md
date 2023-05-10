@@ -1,11 +1,11 @@
 ---
-title: CHERI OS-feature matrix
+title: Operating Systems
 description: >-
   To find out more about the Morello Project, please get in touch!
-permalink: /cheri-feature-matrix/
+permalink: /operating-systems/
 layout: flow
 jumbotron:
-    title: CHERI OS-feature matrix
+    title: Operating Systems
     image: /assets/images/content/iStock-1147065676.jpg
 flow:
   - row: container_row
