@@ -8,9 +8,13 @@ brand:
   alt: Linaro logo
 pages:
   - title: Get Started
-    url: https://linux.morello-project.org/
-  - title: SDK
-    url: https://sdk.morello-project.org/
+    options:
+      - text: CheriBSD
+        url: https://www.cheribsd.org/
+      - text: Linux
+        url: https://linux.morello-project.org/
+      - text: Linux SDK
+        url: https://sdk.morello-project.org/
   - title: CHERI OS-feature matrix
     url: /cheri-feature-matrix/
   - title: Resources
