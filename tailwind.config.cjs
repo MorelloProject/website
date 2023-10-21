@@ -8,7 +8,10 @@ module.exports = {
     extend: {
       colors: {
         accent: "rgb(152, 204, 51)",
+        dark: "rgb(52, 58, 64)",
         linarogreen: "rgb(152, 204, 51)",
+        linkcolor: "rgb(255, 164, 9)",
+        blue: "rgb(0, 135, 181)",
       },
       typography: (theme) => ({
         DEFAULT: {

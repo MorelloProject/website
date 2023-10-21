@@ -1,62 +1,195 @@
 ---
-// import NavBar from '../components/Nav/NavBar.astro';
+import { getCollection, getEntryBySlug } from "astro:content";
 
+import "../styles/global.scss";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
-import { getCollection, getEntries } from "astro:content";
+
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
-import Hero from "@/components/hero/Hero.astro";
-import { getEntryBySlug } from "astro:content";
+import MainHero from "@/components/hero/MainHero.astro";
+import Sections from '@/components/body/DevSection.astro';
 
-type Props = { frontmatter: CollectionEntry<"pages">};
+const allComponents = await import.meta.glob("../components/**/*.astro");
+const rowComponents = {} as Record<string, { default: AstroComponentFactory }>;
 
+for (const rowData of await getCollection("rows")) {
+  rowComponents[rowData.slug] =
+    await allComponents[
+      `${rowData.data.path.replace("@/components", "../components")}`
+    ]();
+}
+
+const sectionComponents = {} as Record<
+  string,
+  { default: AstroComponentFactory }
+>;
+
+for (const sectionData of await getCollection("sections")) {
+  sectionComponents[sectionData.slug] =
+    await allComponents[
+      sectionData.data.path.replace("@/components", "../components")
+    ]();
+}
+
+type Props = { frontmatter: CollectionEntry<"pages"> };
 
 const {
   frontmatter: { slug },
+  // data: { flow, jumbotron },
 } = Astro.props!;
-const page = await getEntryBySlug("pages", slug)
 
-const { title, description, flow, hero, image } = page.data
-
-const allComponents = await import.meta.glob("../components/**/*.astro")
-const rowComponents = {} as Record<string, {default: AstroComponentFactory} >;
-const sectionComponents = {} as Record<
-  string,
-   {default: AstroComponentFactory }
->;
-
-if (flow && flow?.length > 0) {
-  for (const rowData of await getEntries(flow.map((row) => row.row))) {
-    rowComponents[rowData.slug] = await allComponents[rowData.data.path.replace("@/components", "../components")]()
-  }
-
-for (const sectionData of await getEntries(flow.map((row) => row.sections!.map((section) => section.component)).flat())) {
-    sectionComponents[sectionData.slug] = await allComponents[sectionData.data.path.replace("@/components", "../components")]()
-  }
-}
-
+const page = await getEntryBySlug("pages", slug);
+const { flow, hero, title, description,dev_section } = page.data;
+console.log('div iss',dev_section);
 ---
 
-<BaseLayout title={title} description={description}  >
-    <main class="prose mx-0 max-w-full">
-      {hero && <Hero {...hero} />}
-      {
-        flow?.map((row: any) => {
-          const { row: component, sections, ...rowProps } = row
-          const RowComp = rowComponents[component.slug].default;
-          console.log
-          return RowComp ? (
-            <RowComp {...rowProps}>
-              {sections ? sections.map((section: any) => {
-                const {component, ...sectionProps} = section
-                const SectionComp = sectionComponents[component.slug].default
-                console.log(SectionComp)
-                return SectionComp ? <SectionComp {...sectionProps} ><slot /></SectionComp> : <div>Not implemented</div>
-              }) : <></>}
-            </RowComp>
-          ) : <div>Not implemented</div>;
-        })
-      }
-    </main>
-    <!-- <Footer /> -->
+<BaseLayout title={title} description={description}>
+  <main class="prose prose-xl w-full max-w-full md-content ">
+    <MainHero {...hero} />
+    {dev_section &&<Sections dev_section={dev_section} />}
+     
+    {
+      flow?.map((row: any) => {
+        const { row: component, style, sections, ...rowProps } = row;
+     
+        const RowComp = rowComponents[component.slug].default;
+       
+        return RowComp ? (
+          <RowComp {...rowProps}>
+
+            {sections ? sections.map((section: any) => {
+
+              const {component, ...sectionProps} = section
+              const SectionComp = sectionComponents[component.slug].default
+
+              return SectionComp ? <SectionComp {...sectionProps} ><slot /></SectionComp> : <div>Not implemented</div>
+            }) : <></>}
+
+          </RowComp>
+
+        ) : <div>Not implemented</div>;
+      })
+    }
+  </main>
+  <!-- <Footer /> -->
+  <script
+    type="text/javascript"
+    src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"></script>
 </BaseLayout>
+<style is:global lang="scss">
+  .md-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    .developer {
+      @media screen and (max-width: 788px) {
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+
+    p {
+      font-size: 20px;
+    }
+    ul {
+      list-style-type: disc;
+      margin-bottom: 20px;
+      li {
+        font-size: x-large;
+        color: black;
+      }
+    }
+
+    .copy-code {
+      padding: 0 !important;
+      width: 100%;
+      display: flex;
+      justify-content: right;
+      align-items: right;
+
+      img {
+        width: 20px;
+        color: white;
+        background-color: #ededed;
+        transition: background-color 0.3s ease;
+        // position: relative;
+        // z-index: 9999;
+      }
+      img:hover {
+        background-color: #00b1df;
+      }
+    }
+
+    blockquote {
+      background-color: #ededed;
+      border-left: 8px solid #00b1df;
+      color: #555555;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: left;
+      padding: 15px;
+      margin-left: 20px;
+      font-style: italic !important;
+      font-size: 20px;
+      width: 100%;
+      @media screen and (max-width: 788px) {
+        margin-left: auto;
+        margin-right: auto;
+        padding: 3px;
+      }
+
+      .signed-off {
+        background-color: black;
+        color: white;
+      }
+
+      div.content-wrapper {
+        display: flex;
+        flex: 1;
+        align-items: flex-start;
+      }
+
+      pre {
+        flex: 1;
+        background-color: black;
+        padding: 20px;
+        margin-left: 10px;
+        position: relative;
+        align-items: center;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+
+        @media screen and (max-width: 788px) {
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+
+        .copy-code {
+          padding: 0 !important;
+          width: 100%;
+          display: flex;
+          justify-content: right;
+          align-items: right;
+
+          img {
+            width: 20px;
+            color: white;
+            background-color: #ededed;
+            transition: background-color 0.3s ease;
+          }
+          img:hover {
+            background-color: #00b1df;
+          }
+        }
+      }
+      code {
+        background-color: black;
+        color: white;
+        padding: 10px;
+        width: 100% !important;
+        margin-left: 5px;
+      }
+    }
+  }
+</style>

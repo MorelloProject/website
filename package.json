@@ -14,8 +14,10 @@
     "linaro-astro-template": "bin/install.mjs"
   },
   "dependencies": {
+    "@astrojs/check": "^0.2.1",
     "@astrojs/sitemap": "^3.0.2",
     "@astrojs/tailwind": "^5.0.2",
+    "@astrolib/analytics": "^0.4.2",
     "@fontsource/lato": "^5.0.16",
     "@tailwindcss/typography": "^0.5.10",
     "astro": "^3.3.2",

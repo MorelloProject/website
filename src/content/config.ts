@@ -6,12 +6,22 @@ const pages = defineCollection({
     z.object({
       title: z.string(),
       description: z.string(),
-      image: image(),
+      image: image().optional(),
       hero: z
         .object({
           title: z.string(),
           background_image: image(),
           style: z.string(),
+          first_section: z.object({
+            image: image(),
+            image_alt: z.string(),
+            text: z.string(),
+          }),
+          second_section: z.object({
+            image: image(),
+            image_alt: z.string(),
+            text: z.string(),
+          }),
           inner_image: z
             .object({
               src: image(),
@@ -20,17 +30,37 @@ const pages = defineCollection({
             .optional(),
         })
         .optional(),
+      dev_section: z.array(
+        z.object({
+          first_column: z.object({
+            image: image(),
+            title: z.string(),
+            url: z.string(),
+            text: z.string(),
+          }),
+          second_column: z.object({
+            image: image(),
+            title: z.string(),
+            url: z.string(),
+            text: z.string(),
+          }),
+        })
+      ),
+
       flow: z
         .array(
           z.object({
             row: reference("rows"),
-            sections: z.array(
-              z
-                .object({
-                  component: reference("sections"),
-                })
-                .catchall(z.any())
-            ),
+            style: z.string(),
+            sections: z
+              .array(
+                z
+                  .object({
+                    component: reference("sections"),
+                  })
+                  .catchall(z.any())
+              )
+              .optional(),
           })
         )
         .optional(),

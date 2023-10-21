@@ -1,0 +1,40 @@
+---
+import * as marked from "marked";
+
+const { first_section, second_section } = Astro.props!;
+const markdown_first = marked.parse(first_section.text);
+const markdown_second = marked.parse(second_section.text);
+---
+
+<div class="flex flex-col md:flex-row w-[50%] items-center justify-center">
+  <div class="mr-4 mb-4 md:mb-0 relative flex-1 mt-10">
+    <div
+      class="relative overflow-hidden bg-cover bg-no-repeat"
+      style={{ height: "300px" }}
+    >
+      <img
+        class="rounded border-x-4 border-white border-t-4 w-full h-[250px] object-cover"
+        src={first_section.image.src}
+        alt={first_section.image.alt}
+      />
+    </div>
+    <div class="p-6 max-w-max text-center">
+      <p class="text-base text-dark !important" set:html={markdown_first} />
+    </div>
+  </div>
+  <div class="relative flex-1">
+    <div
+      class="relative overflow-hidden bg-cover bg-no-repeat"
+      style={{ height: "300px" }}
+    >
+      <img
+        class="rounded h-[250px] border-x-4 border-white border-t-4 w-full object-cover"
+        src={second_section.image.src}
+        alt={second_section.image.alt}
+      />
+    </div>
+    <div class="p-6 max-w-max text-center">
+      <p class="text-base text-dark" set:html={markdown_second} />
+    </div>
+  </div>
+</div>
