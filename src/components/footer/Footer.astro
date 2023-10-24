@@ -1,29 +1,56 @@
 ---
-import { getEntry } from "astro:content";
 import { Image } from "astro:assets";
-import LinaroLogo from "../../assets/images/linaro-logo.png";
-const footer = await getEntry("data", "footer");
-const { data }: any = footer;
+import LinaroLogo from "../../assets/images/logo.png";
+import Icon from "astro-icon";
 ---
 
-<footer class="justify-self-end mt-auto">
-  {
-    data.map((row: any) => (
-      <ul class="flex flex-row flex-wrap justify-center gap-5">
-        {row.map((item: any) => {
-          const Component = item.url ? "a" : "p";
-          return (
-            <li>
-              <Component href={item.url}>{item.label}</Component>
-            </li>
-          );
-        })}
-      </ul>
-    ))
-  }
+<div class=`flex flex-col text-white bg-[#575757]`>
+  <div class="flex flex-wrap flex-row items-center justify-center mt-4 gap-4">
+    <a href="https://github.com/devicetree-org/devicetree-website">
+      <Icon
+        name="mdi:github"
+        class="w-6 text-white mb-[1rem] hover:text-linkcolor"
+      />
+    </a>
+
+    <a
+      href="https://github.com/MorelloProject/website/issues/new?title=Problem+with+_pages/homepage.md&body=Please+enter+some+details+about+the+bug/issue+so+we+can+promptly+resolve+it.+%0D%0AURL%3A++https://www.morello-project.org/"
+      class="flex item-center mb-[1rem] no-underline text-white font-medium p-2 cursor-pointer hover:text-linkcolor hover:underline hover:transition-all rounded-md"
+      >Report an Issue</a
+    >
+    <a
+      href="https://github.com/MorelloProject/website"
+      class="flex item-center mb-[1rem] no-underline text-white font-medium p-2 cursor-pointer hover:text-linkcolor hover:underline hover:transition-all rounded-md"
+    >
+      Edit on Github
+    </a>
+  </div>
+  <div class="flex flex-row flex-wrap justify-center items-center gap-3">
+    <p class="h-full pt-4">Copyright @ 2022 Linaro Limited</p>
+    <a
+      href="/legal"
+      class="cursor-pointer no-underline text-white hover:text-linkcolor hover:underline"
+      >Legal</a
+    >
+    <a
+      href="/cookies"
+      class="cursor-pointer no-underline text-white hover:text-linkcolor hover:underline"
+      >Cookies</a
+    >
+    <a
+      href="/contact"
+      class="cursor-pointer no-underline text-white hover:text-linkcolor hover:underline"
+      >Contact</a
+    >
+    <div class="flex flex-row h-full gap-5">
+      <a href="https://github.com/MorelloProject">
+        <Icon name="mdi:github" class="w-6 text-white hover:text-linkcolor" />
+      </a>
+    </div>
+  </div>
   <div class="flex flex-row justify-center my-4">
     <a href="/">
       <Image class="w-[80px]" src={LinaroLogo} alt="logo" />
     </a>
   </div>
-</footer>
+</div>

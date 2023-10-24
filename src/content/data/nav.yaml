@@ -1,8 +1,16 @@
-- label: View on Github
-  url: https://github.com/linaro-astro-template
-- label: Dropdown
-  children:
-    - label: Option 1
-      url: /option1
-    - label: Option 2
-      url: /option2
+- label: Get Started
+  url: https://linux.morello-project.org/
+# - label: SDK
+#   children:
+#     - label: Overview
+#       url: /governance
+#     - label: Releases
+#       url: /releases
+- label: SDK
+  url: https://sdk.morello-project.org/
+- label: CHERI OS-feature matrix
+  url: /cheri-feature-matrix
+- label: Resources
+  url: /resources
+- label: Contact
+  url: /contact

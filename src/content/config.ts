@@ -5,23 +5,35 @@ const pages = defineCollection({
   schema: ({ image }) =>
     z.object({
       title: z.string(),
-      description: z.string(),
+      description: z.string().optional(),
       image: image().optional(),
       hero: z
         .object({
           title: z.string(),
-          background_image: image(),
-          style: z.string(),
-          first_section: z.object({
-            image: image(),
-            image_alt: z.string(),
-            text: z.string(),
-          }),
-          second_section: z.object({
-            image: image(),
-            image_alt: z.string(),
-            text: z.string(),
-          }),
+          description: z.string().optional(),
+          background_image: image().optional(),
+          style: z.string().optional(),
+          buttons: z
+            .object({
+              title: z.string(),
+              url: z.string(),
+              style: z.string(),
+            })
+            .optional(),
+          first_section: z
+            .object({
+              image: image(),
+              image_alt: z.string(),
+              text: z.string(),
+            })
+            .optional(),
+          second_section: z
+            .object({
+              image: image(),
+              image_alt: z.string(),
+              text: z.string(),
+            })
+            .optional(),
           inner_image: z
             .object({
               src: image(),
@@ -30,28 +42,30 @@ const pages = defineCollection({
             .optional(),
         })
         .optional(),
-      dev_section: z.array(
-        z.object({
-          first_column: z.object({
-            image: image(),
-            title: z.string(),
-            url: z.string(),
-            text: z.string(),
-          }),
-          second_column: z.object({
-            image: image(),
-            title: z.string(),
-            url: z.string(),
-            text: z.string(),
-          }),
-        })
-      ),
+      dev_section: z
+        .array(
+          z.object({
+            first_column: z.object({
+              image: image(),
+              title: z.string(),
+              url: z.string(),
+              text: z.string(),
+            }),
+            second_column: z.object({
+              image: image(),
+              title: z.string(),
+              url: z.string(),
+              text: z.string(),
+            }),
+          })
+        )
+        .optional(),
 
       flow: z
         .array(
           z.object({
-            row: reference("rows"),
-            style: z.string(),
+            row: reference("rows").optional(),
+            style: z.string().optional(),
             sections: z
               .array(
                 z
@@ -64,6 +78,18 @@ const pages = defineCollection({
           })
         )
         .optional(),
+    }),
+});
+
+const resources = defineCollection({
+  type: "content",
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      author: z.string(),
+      date: z.date(),
+      description: z.string().optional(),
+      image: image(),
     }),
 });
 
@@ -93,4 +119,5 @@ export const collections = {
   rows,
   sections,
   data,
+  resources,
 };

@@ -1,0 +1,19 @@
+---
+import { getCollection } from "astro:content";
+import FirstItem from "../../components/resources/FirstItem.astro";
+import dayjs from "dayjs";
+
+const resources = await getCollection("resources");
+console.log("resources", resources);
+
+const resourceLists = resources
+  .sort((a, b) => dayjs(b.data.date).diff(dayjs(a.data.date)))
+  .slice(0, 10);
+---
+
+<section class="container max-w-7xl mx-auto">
+  <ul class="">
+    <FirstItem {...resourceLists[0]} />
+    <!-- {blogLists.slice(1).map((blog) => <ResourcesItem {...blog} />)} -->
+  </ul>
+</section>
