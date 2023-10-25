@@ -4,7 +4,6 @@ title: CHERIseed – port effortlessly to CHERI
 date: 2022-12-08 12:00:00
 category: resources
 description: Enabling users to run CHERI semantics within non-CHERI architecture. A tool to detect capability violations and help users port their codebase to CHERI.
-layout: post
 image: ../../assets/images/content/Security_screen.jpg
 extra:
   head: |
@@ -147,277 +146,6 @@ extra:
     </script>
 ---
 
-<!-------------------------- SIDEBAR LIST ------------------------------------->
-<ul class="nav flex-column col-sm position-fixed" id="sidebar-cheriseed">
-    <li class="nav-item">
-        <a class="nav-link" href="#cheri---overview">CHERI - Overview</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#cheriseed--introduction">CHERIseed - Introduction</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#bringing-cheriseed-to-your-project">Bringing CHERIseed to your project</a>
-    </li>
-    <li class="nav-item sidebar-cheriseed-2">
-        <a class="nav-link" href="#source--stringc">Source - string.c</a>
-    </li>
-    <li class="nav-item sidebar-cheriseed-2">
-        <a class="nav-link" href="#compiling">Compiling</a>
-    </li>
-    <li class="nav-item sidebar-cheriseed-2">
-        <a class="nav-link" href="#adapting-to-cheri">Adapting to CHERI</a>
-    </li>
-    <li class="nav-item sidebar-cheriseed-2">
-        <a class="nav-link" href="#program-is-now-more-cheri-ready">Program is now more CHERI-ready</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#other-examples">Other Examples</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#limitations">Limitations</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#inviting-you-to-collaborate-and-contribute">Contributions</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#references">References</a>
-    </li>
-</ul>
-
-<!-------------------------- UTILITY MACROS ----------------------------------->
-
-{% capture additional_notes     %}<div class="card bg-light mb-2">{% endcapture %}
-{% capture note_header          %}<div class="card-header">{% endcapture %}
-{% capture end_note_header      %}</div><div class="card-body px-3">{% endcapture %}
-{% capture end_additional_notes %}</div></div>{% endcapture %}
-
-{% capture custom_code          %}<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% endcapture %}
-{% capture custom_code_remove_cr %}<div class="highlighter-rouge"><div class="highlight remove-copyright"><pre class="highlight"><code>{% endcapture %}
-{% capture end_custom_code      %}</code></pre></div></div>{% endcapture %}
-{% capture red_c                %}<span style="color:#e00f41">{% endcapture %}
-{% capture green_c              %}<span style="color:#179f56">{% endcapture %}
-{% capture cyan_c               %}<span style="color:#01b4cc">{% endcapture %}
-{% capture magenta_c            %}<span style="color:magenta">{% endcapture %}
-{% capture blue_c               %}<span style="color:#2961ba">{% endcapture %}
-{% capture yellow_c             %}<span style="color:#f1c232">{% endcapture %}
-{% capture end_c                %}</span>{% endcapture %}
-{% capture emphasize_me         %}<code class="highlighter-rouge">{% endcapture %}
-{% capture end_emphasize_me     %}</code>{% endcapture %}
-{% capture custom_highlight     %}<div class="highlighter-rouge"><div class="highlight"><pre class="highlight">{% endcapture %}
-{% capture custom_highlight_remove_cr %}<div class="highlighter-rouge"><div class="highlight remove-copyright"><pre class="highlight">{% endcapture %}
-{% capture end_custom_highlight %}</pre></div></div>{% endcapture %}
-
-<!----------------------- MUSL-LIBC BUILD CONTENT ----------------------------->
-
-{% capture musl_libc_text %}
-
-<p><b>Setting up Clang</b></p>
-
-<p>Clone the LLVM project repository for CHERIseed from <a href="https://git.morello-project.org/morello/llvm-project/-/tree/cheriseed">https://git.morello-project.org/morello/llvm-project/-/tree/cheriseed</a>. See <a href="https://clang.llvm.org/get_started.html#:~:text=Get%20the%20required%20tools.,at%3A%20https%3A//cmake.org/download/">Getting Started: Building and Running Clang</a> for the System Requirements and instructions for how to generate a build system for CHERIseed-enabled clang with {{ emphasize_me }}CMake{{ end_emphasize_me }}.</p>
-<p>To configure the builds, use</p>
-
-<ol>
-    <li>CMake option {{ emphasize_me }}-DLLVM_ENABLE_PROJECTS="clang;compiler-rt"{{ end_emphasize_me }}
-        is required to allow building the CHERIseed compiler-rt.</li>
-    <li>CMake option {{ emphasize_me }}-DLLVM_TARGETS_TO_BUILD="X86;AArch64"{{ end_emphasize_me }}
-        is recommended, to avoid build errors from other target platforms.</li>
-</ol>
-
-<p>Once cmake has finished generating the build files, the targets to build are:</p>
-
-{{ custom_highlight }}{% highlight sh %}make clang compiler-rt{% endhighlight %}{{ end_custom_highlight }}
-
-<p>When the build completes, {{ emphasize_me }}build/bin/{{ end_emphasize_me }} will contain {{ emphasize_me }}clang{{ end_emphasize_me }} that is compatible with {{ emphasize_me }}-fsanitize=cheriseed{{ end_emphasize_me }}.</p>
-
-<p><b>Building musl-libc</b></p>
-
-<p>To compile with the pure-capability ABI enabled you must first obtain a ported, pure-capability ABI version of the following libraries:</p>
-<ul>
-    <li><a href="https://git.morello-project.org/morello/musl-libc/-/tree/cheriseed">musl-libc</a>
-    </li>
-    <li><a href="https://git.morello-project.org/morello/android/platform/external/libshim/-/tree/morello/mainline">libshim</a>
-    </li>
-</ul>
-<p>Each should be placed in adjacent directories to {{ emphasize_me }}llvm-project/{{ end_emphasize_me }}.</p>
-<p>The following configuration should be exported to the environment:</p>
-
-{{ custom_highlight }}{% highlight sh %}export CC=<path-to>/llvm-project/build/bin/clang
-export AR=$(which ar)
-export RANLIB=$(which ranlib)
-export TARGET_ARCH=$(uname -m)
-export TARGET_TRIPLE=${TARGET_ARCH}-linux-musl
-export MUSL_PREFIX=<path-to>/musl-libc/obj/install/${TARGET_TRIPLE}
-export LIBSHIM_DIR=<path-to>/libshim/{% endhighlight %}{{ end_custom_highlight }}
-
-<p>Then call the {{ emphasize_me }}configure{{ end_emphasize_me }} tool in {{ emphasize_me }}musl-libc/{{ end_emphasize_me }} with the following arguments</p>
-{{ custom_highlight }}{% highlight sh %}./configure --disable-shared --disable-morello \
-      --enable-cheriseed --libshim-path=${LIBSHIM_DIR} \
-      --target=${TARGET_TRIPLE} \
-      --prefix=${MUSL_PREFIX}{% endhighlight %}{{ end_custom_highlight }}
-
-<p>And finally:</p>
-
-{{ custom_highlight }}{% highlight sh %}make -j$(nproc) install{% endhighlight %}{{ end_custom_highlight }}
-
-<p>The result of this should be:</p>
-
-{{ custom_highlight }}{% highlight sh %}$> ls ${MUSL_PREFIX}
-bin include lib share{% endhighlight %}{{ end_custom_highlight }}
-
-<p>You can now compile the source code to a static binary with the following command:</p>
-{{ custom_highlight }}{% highlight sh %}${CC} \
-    --target=${TARGET_TRIPLE} \
-    -rtlib=compiler-rt \
-    --sysroot="${MUSL_PREFIX}" \
-    -lc -lpthread -lm -lrt \
-    -fsanitize=cheriseed \
-    -mabi=purecap \
-    -static \
-    <filename.c>{% endhighlight %}{{ end_custom_highlight }}
-{% endcapture %}
-
-<!--------------------------- EXAMPLE CONTENT --------------------------------->
-
-{% capture example_text %}
-
-<p>This page explores the use of CHERIseed with an example implementation for <a href="https://en.wikipedia.org/wiki/Feistel_cipher">Feistel cipher algorithm</a>.</p>
-<p>Source – <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/8b42372dc9b0eeda33ca484cc02d93067d09363d/cheriseed/001-blogpost/feistel/feistel.c">feistel.c</a></p>
-
-{{ custom_highlight }}{% highlight c %}
-{% load_external_file https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/8b42372dc9b0eeda33ca484cc02d93067d09363d/cheriseed/001-blogpost/feistel/feistel.c %}
-{% endhighlight %}{{ end_custom_highlight }}
-
-<p>Compile {{ emphasize_me }}feistel.c{{ end_emphasize_me }} on the host machine using the following command.</p>
-
-{{ custom_highlight }}{% highlight sh %}$> ${CC} \
-  --target=${TARGET_TRIPLE} \
- -rtlib=compiler-rt \
- --sysroot="${MUSL_PREFIX}" \
- -lc -lpthread -lm -lrt \
- -fuse-ld=lld \
- -fsanitize=cheriseed \
- -mabi=purecap \
- -static \
- -o feistel.o feistel.c{% endhighlight %}{{ end_custom_highlight }}
-
-<p>Now run the program and use {{ emphasize_me }}gdb{{ end_emphasize_me }} to inspect the issue.</p>
-
-{{ custom_highlight }}{% highlight none %}(gdb) r
-Starting program: /home/cheriseed-example/feistel.o
-
-================================================================
-Runtime Error detected by CHERIseed
-
-Capability is untagged at 0xeffff7feacb0:
-
-0xfffff7ff0040 [0x000000000000-0xffffffffffffffff] (invalid)
-
-Tag address was at 0xfefff77eeacb
-
-Shadow memory layout:
-low [0xeffff7ff0000-0xfefff77ef000]
-gap [0xfefff77ef000-0xfffff77ef000]
-high [0xfffff77ef000-0xfffff7ff0000]
-
-# tid: 430628
-
-Program received signal SIGSEGV, Segmentation fault.
-0x0000000000232c1a in morello::shim::svc_impl () at src/svc.cpp:54
-54 src/svc.cpp: No such file or directory.
-(gdb) where
-#0 0x0000000000232c1a in morello::shim::svc_impl () at src/svc.cpp:54
-#1 0x0000000000232b9a in morello::shim::svc (arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=..., nr=<optimised out>, cg=...) at src/svc.cpp:183
-#2 0x00000000002387b8 in morello::shim::syscall (arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=..., nr=<optimised out>, cg=...) at build/gen/src/syscall.cpp:370
-#3 0x000000000023b66f in **shim_syscall (cg=..., nr=<optimised out>, arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=...) at build/gen/src/syscall.cpp:1031
-#4 0x000000000022c389 in Call () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_libc.cpp:139
-#5 0x000000000022bcde in Raise () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_libc.cpp:399
-#6 0x000000000022ad38 in RaiseSignal () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_errors.cpp:380
-#7 0x0000000000228d71 in RaiseSignal<**cheriseed::error::NotTaggedError, **cheriseed::LocalCap const&> () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_errors.h:309
-#8 0x000000000022662c in NotTaggedViolation () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed.cpp:57
-#9 RequireTagged () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_local_cap.h:105
-#10 **cheriseed_check_access () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed.cpp:698
-#11 0x000000000022f4dc in memcpy (dest=<optimised out>, src=<optimised out>, n=<optimised out>) at src/string/memcpy.c:39
-#12 0x0000000000273284 in feistel () at before.c:62
-#13 0x0000000000274c55 in run_feistel () at before.c:121
-#14 0x000000000027433f in TEST () at before.c:129
-#15 0x00000000002740d4 in main () at before.c:83
-(gdb) break feistel
-Breakpoint 1 at 0x26f6cc: file feistel.c, line 62.
-(gdb) r
-The program being debugged has been started already.
-Start it from the beginning? (y or n) y
-Starting program: /home/cheriseed-workspace/feistel.o
-
-Breakpoint 1, feistel () at feistel.c:62
-43 if (iteration == -1) return (void \*)b->data.addr;
-(gdb) n 5
-62 in before.c
-(gdb) break memcpy
-Breakpoint 2 at 0x23887c: file src/string/memcpy.c, line 14.
-(gdb) c
-Continuing.
-
-Breakpoint 2, memcpy (dest=<optimized out>, src=<optimized out>, n=<optimized out>) at src/string/memcpy.c:14
-14 src/string/memcpy.c: No such file or directory.
-(gdb) info registers x1 x2 x3
-x1 0xeffff7feb4b0 263882656363696
-x2 0xeffff7feb4a0 263882656363680
-x3 0x4 4
-(gdb) x/2xg 0xeffff7feb4b0
-0xeffff7feb4b0: 0x0000fffff7ff0060 0x0000000000000000
-(gdb) x/2xg 0xeffff7feb4a0
-0xeffff7feb4a0: 0x0000fffff7ff0040 0x0000000000000000
-(gdb) x/s 0x0000fffff7ff0040
-0xfffff7ff0040: "THIS"{% endhighlight %}{{ end_custom_highlight }}
-
-<p>Inspecting the CHERIseed error message we can identify the type of violation. In our case, frame 11 is the one in concern and resulted in untagged capability violation because {{ emphasize_me }}Data.addr{{ end_emphasize_me }} is of the {{ emphasize_me }}size_t{{ end_emphasize_me }} type which cannot represent a capability. To read more about these CHERI violations see section 6.1 of <a href="https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf">CHERI C/C++ Programming Guide</a>. Changing from all {{ emphasize_me }}size_t{{ end_emphasize_me }} to {{ emphasize_me }}uintptr_t{{ end_emphasize_me }} at Line 15 solves this issue.</p>
-<p>Similarly, function prototypes of {{ emphasize_me }}xor{{ end_emphasize_me }} and {{ emphasize_me }}round_function{{ end_emphasize_me }} take capability arguments but is casted to {{ emphasize_me }}long{{ end_emphasize_me }} which can be modified to {{ emphasize_me }}uintptr_t{{ end_emphasize_me }}.</p>
-
-<p>Running the program again gives the following output.</p>
-
-{{ custom_highlight }}{% highlight none %}
-(gdb) r
-Starting program: /home/cheriseed-example/feistel.o
-
-================================================================
-Runtime Error detected by CHERIseed
-
-Prevented out-of-bounds access with capability at 0xeffff7feb650:
-
-0xfffff7ff00a4 [rwRW,0xfffff7ff00a0-0xfffff7ff00a4]
-
-Requested range was 0xfffff7ff00a4-0xfffff7ff00a5
-
-Tag address was at 0xfefff77eeb65
-
-Shadow memory layout:
-low [0xeffff7ff0000-0xfefff77ef000]
-gap [0xfefff77ef000-0xfffff77ef000]
-high [0xfffff77ef000-0xfffff7ff0000]
-
-# tid: 459349
-
-Program received signal SIGSEGV, Segmentation fault.
-0x0000000000232c1a in morello::shim::svc_impl () at src/svc.cpp:54
-54 in src/svc.cpp
-(gdb) where -4
-#11 0x0000000000263401 in strlen (s=<optimised out>) at src/string/strlen.c:28
-#12 0x00000000002745b0 in run_feistel () at before.c:107
-#13 0x00000000002741fb in TEST () at before.c:130
-#14 0x0000000000273f24 in main () at before.c:83
-{% endhighlight %}{{ end_custom_highlight }}
-
-<p>In this case, we see that the capability referencing the {{ emphasize_me }}text_ptr{{ end_emphasize_me }} has length {{ emphasize_me }}0x04{{ end_emphasize_me }} but the {{ emphasize_me }}strlen(){{ end_emphasize_me }} is accessing the additional memory for the delimiter. Having a close look at the trace we find that we are getting out-of-bounds error while passing {{ emphasize_me }}encoded_text{{ end_emphasize_me }} to the {{ emphasize_me }}run_feistel(){{ end_emphasize_me }} at Line 130. Hence, CHERIseed helped to find an out of bounds access in the source and we can allocate an extra character to store null terminator.</p>
-
-<p>The fix: <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/ad587e4043dfa30962082d1c8be9eeea9e5fc791.diff">patch</a></p>
-
-{{ custom_highlight }}{% highlight diff %}
-{% load_external_file https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/ad587e4043dfa30962082d1c8be9eeea9e5fc791.diff %}
-{% endhighlight %}{{ end_custom_highlight }}
-
-<p>The source can now be build and run on CHERI-hardware.</p>
-{% endcapture %}
-
 <!-------------------------- MAIN CONTENT ------------------------------------->
 
 # CHERI - Overview
@@ -442,40 +170,46 @@ CHERIseed is a semantic implementation of CHERI C/C++ which provides developers 
 
 This section explores the use of CHERIseed by demonstrating how it displays a CHERI violation and how it helps to fix a bug. A simple example, which runs without issues, produces a capability violation when compiled with CHERIseed enabled, revealing a bug. Currently, CHERIseed allows to build and run static and dynamically linked applications on `aarch64` or `x86` machines. See [CHERI C/C++ Programming Guide] [pro-guide], for more details.
 
-### Source – [string.c] [source-link]
+### Source – [string.c](source-link)
 
-{% highlight c linenos %}
-{% load_external_file https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/491db32a6a29fdc33144a2baeb82850094ee9866/cheriseed/001-blogpost/string/string.c %}
-{% endhighlight %}
+`https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/491db32a6a29fdc33144a2baeb82850094ee9866/cheriseed/001-blogpost/string/string.c`
 
 ### Compiling
 
 Check the <a data-toggle="modal" data-target="#buildModal">musl-libc build</a> to see how to setup the environment to build CHERIseed on your machine.
 Compile `string.c` on the host machine using the flags `-fsanitize=cheriseed` to enable CHERIseed and `-cheri-bounds=subobject-safe` to enable enforcements on C-language objects within allocations.
 
-<div class="modal fade" id="buildModal" tabindex="-1" aria-labelledby="buildModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="buildModal"
+  tabindex="-1"
+  aria-labelledby="buildModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+      <div class="modal-header">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <div class="modal-body">{{ musl_libc_text }}</div>
       <div class="modal-footer"></div>
     </div>
   </div>
 </div>
-```sh
-$> ${CC} \
-  --target=${TARGET_TRIPLE} \
-  -rtlib=compiler-rt \
-  --sysroot="${MUSL_PREFIX}" \
-  -lc -lpthread -lm -lrt \
-  -fuse-ld=lld \
-  -fsanitize=cheriseed \
-  -mabi=purecap \
-  -static \
-  -cheri-bounds=subobject-safe \
-  string.c -o string.bin
-```
-Pure Capability (`purecap`) is a new ABI which requires pre-ported `libc` support. This mode indicates that all pointers should automatically be represented as a capability, without the need for `__capability` annotations. Use the flag `-mabi=purecap` to compile in purecap.
+```sh $> ${CC} \ --target=${TARGET_TRIPLE} \ -rtlib=compiler-rt \ --sysroot="${
+  MUSL_PREFIX
+}" \ -lc -lpthread -lm -lrt \ -fuse-ld=lld \ -fsanitize=cheriseed \ -mabi=purecap
+\ -static \ -cheri-bounds=subobject-safe \ string.c -o string.bin ``` Pure Capability
+(`purecap`) is a new ABI which requires pre-ported `libc` support. This mode indicates
+that all pointers should automatically be represented as a capability, without the
+need for `__capability` annotations. Use the flag `-mabi=purecap` to compile in purecap.
 
 {{ additional_notes }}
 {{ note_header }}Design{{ end_note_header }}
@@ -484,7 +218,13 @@ CHERIseed is based on LLVM project, and it is composed of LLVM module pass and c
 <p><b><a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_source.c">Source</a></b></p>
 {{ custom_highlight_remove_cr }}{% highlight c %}{% load_external_file https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_source.c %}{% endhighlight %}{{ end_custom_highlight }}
 
-<p><b><a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_llvm_ir_1.txt">Input IR</a></b></p>
+<p>
+  <b>
+    <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_llvm_ir_1.txt">
+      Input IR
+    </a>
+  </b>
+</p>
 
 {{ custom_code }}{% highlight none %}{% load_external_file https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_llvm_ir_1.txt %}{% endhighlight %}{{ end_custom_code }}
 
@@ -638,7 +378,7 @@ In this case, we see that the program progressed further and now the capability 
 
 Finally, we have the source running successfully using CHERIseed and we can say the program is now more CHERI-ready, i.e., that the source can be built and run on CHERI hardware. CHERIseed made it easy for us interpret the bug by giving elaborate details of the which operation failed and which capability was to be corrected etc.
 
-The [fix] [diff-link]:
+The [fix](diff-link):
 
 ```diff
 {% load_external_file https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/4ce0ecbfdb129a37e3d26aa7cfed966bcc7f47e1.diff %}
@@ -653,12 +393,29 @@ There are a set of builtin functions which provides access to capability propert
 
 # Other Examples
 
-1. <a data-toggle="modal" data-target="#exampleModal">Fiestel cipher example</a>
+1. <a data-toggle="modal" data-target="#exampleModal">
+     Fiestel cipher example
+   </a>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+      <div class="modal-header">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <div class="modal-body">{{ example_text }}</div>
       <div class="modal-footer"></div>
     </div>

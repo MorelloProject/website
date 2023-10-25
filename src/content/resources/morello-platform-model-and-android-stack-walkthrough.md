@@ -3,7 +3,6 @@ author: linaro
 title: Morello Platform Model and Android stack walkthrough
 date: 2020-11-26 14:00:00
 category: resources
-layout: post
 image: ../../assets/images/content/morello-stack-guide-cover.png
 ---
 

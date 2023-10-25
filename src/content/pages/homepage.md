@@ -22,16 +22,20 @@ hero:
       A DSbD technology platform prototype (the Morello board) provides a SoC implementation of the architecture. 
       This was created to enable software developers and researchers to explore real-world use cases and inform future development.
 dev_section:
-  - first_column:
-      image: ../../assets/images/content/icon-2.png
-      title: "Code repositories"
-      url: "https://git.morello-project.org/morello"
-      text: "Code repositories for Morello Linux environments"
-    second_column:
-      image: ../../assets/images/content/icon-1.png
-      title: "Arm Morello pages"
-      url: "https://www.arm.com/architecture/cpu/morello"
-      text: "Architecture specifications, hardware reference manuals, community forum, etc."
+  [
+    {
+      image: ../../assets/images/content/icon-2.png,
+      title: "Code repositories",
+      url: "https://git.morello-project.org/morello",
+      text: "Code repositories for Morello Linux environments",
+    },
+    {
+      image: ../../assets/images/content/icon-1.png,
+      title: "Arm Morello pages",
+      url: "https://www.arm.com/architecture/cpu/morello",
+      text: "Architecture specifications, hardware reference manuals, community forum, etc.",
+    },
+  ]
 
 flow:
   - row: container_row
@@ -43,7 +47,7 @@ flow:
     style: bg-light morello-content
     sections:
       - component: text
-        style: bg-white p-4 my-3
+        style: bg-white p-2 my-3
         text_content:
           text: |-
             ## Introduction
@@ -52,7 +56,7 @@ flow:
             The Morello platform is supported by a number of evolving RTOS/OS environments at different stages of maturity. [CheriBSD](https://www.cheribsd.org/) is implemented and hosted separately by the University of Cambridge and SRI International and includes a memory-safe kernel, userspace and various example frameworks. The [CHERI OS-feature matrix]( https://www.morello-project.org/cheri-feature-matrix/) includes more information on features implemented by Morello Linux and CheriBSD operating systems.
 
       - component: text
-        style: bg-white p-4 my-3
+        style: bg-white p-2 my-3
         text_content:
           text: |-
             ## Development Platforms
@@ -60,7 +64,7 @@ flow:
 
             The Morello hardware development platform is now available to organizations involved in defined research activities. Access to the platform is managed by the UK government's Digital Security by Design (DSbD) [Technology Access Programme](https://www.dsbd.tech/technology-access-programme/).
 
-            ![](../assets/images/content/DSCF0211-Edit.jpg){: width="400" }
+            ![alt text](../../src/assets/images/content/DSCF0211-Edit.jpg)
 
             To get started please refer to our [Morello User Guide](https://linux.morello-project.org/docs/user-guide/).
 

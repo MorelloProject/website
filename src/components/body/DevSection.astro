@@ -1,39 +1,25 @@
 ---
 import { Image } from "astro:assets";
 const { dev_section } = Astro.props!;
+console.log(dev_section);
 ---
 
-<div class="bg-[#273548] flex flex-col md:flex-row items-center justify-center">
+<div
+  class="bg-[#273548] flex flex-col md:flex-row items-center justify-center mx-auto"
+>
   {
     dev_section.map((card: any) => (
-      <>
-        <div class="mr-4 block rounded-lg ">
-          <div class="p-6 flex flex-col items-center justify-center w-[600px] text-center">
-            <Image class="w-[120px]" alt="icon" src={card.first_column.image} />
-            <a href={card.second_column.url} class="hover:underline">
-              <h3 class="mb-2 font-bold text-3xl  leading-tight text-blue">
-                {card.first_column.title}
-              </h3>
-            </a>
-            <p class="mb-4 text-base text-white">{card.first_column.text}</p>
-          </div>
+      <div class=" rounded-lg ">
+        <div class="mx-auto mr-4 flex flex-col items-center justify-center w-[80%] text-center">
+          <img class="w-[120px]" alt="icon" src={card.image.src} />
+          <a href={card.url} class="hover:underline">
+            <h3 class="mb-2 font-bold text-3xl  leading-tight text-blue">
+              {card.title}
+            </h3>
+          </a>
+          <p class="mb-4 text-base text-white">{card.text}</p>
         </div>
-        <div class="mr-4 block rounded-lg ">
-          <div class="p-6 flex flex-col items-center justify-center w-[600px] text-center">
-            <Image
-              class="w-[120px]"
-              alt="icon"
-              src={card.second_column.image}
-            />
-            <a href={card.second_column.url} class="hover:underline">
-              <h3 class="mb-2 font-bold text-3xl leading-tight text-blue">
-                {card.second_column.title}
-              </h3>
-            </a>
-            <p class="mb-4 text-base text-white">{card.second_column.text}</p>
-          </div>
-        </div>
-      </>
+      </div>
     ))
   }
 </div>

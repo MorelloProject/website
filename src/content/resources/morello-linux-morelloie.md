@@ -3,7 +3,6 @@ author: arm
 title: Sense and Capability – Try Morello on Linux using Morello IE
 date: 2023-05-08 09:00:00
 category: resources
-layout: post
 image: ../../assets/images/content/morelloie-thumb.png
 description: A walkthrough guide that should help future CHERI and Morello users learn about using new CPU architecture features on Linux.
 ---

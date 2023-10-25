@@ -45,18 +45,10 @@ const pages = defineCollection({
       dev_section: z
         .array(
           z.object({
-            first_column: z.object({
-              image: image(),
-              title: z.string(),
-              url: z.string(),
-              text: z.string(),
-            }),
-            second_column: z.object({
-              image: image(),
-              title: z.string(),
-              url: z.string(),
-              text: z.string(),
-            }),
+            image: image(),
+            title: z.string(),
+            url: z.string(),
+            text: z.string(),
           })
         )
         .optional(),
@@ -90,6 +82,11 @@ const resources = defineCollection({
       date: z.date(),
       description: z.string().optional(),
       image: image(),
+      extra: z
+        .object({
+          head: z.string(),
+        })
+        .optional(),
     }),
 });
 

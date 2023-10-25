@@ -3,7 +3,6 @@ author: arm
 title: Capinfo
 date: 2021-09-17 09:00:00
 category: resources
-layout: post
 image: ../../assets/images/content/capinfo-thumb.png
 ---
 

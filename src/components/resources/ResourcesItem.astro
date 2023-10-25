@@ -1,0 +1,45 @@
+---
+const { resource } = Astro.props;
+import dayjs from "dayjs";
+import { Image } from "astro:assets";
+import armLogo from "../../assets/images/content/arm-logo.jpg";
+
+const dateObj = dayjs(resource.data.date);
+const dateString = dateObj.format("dddd, MMMM D, YYYY");
+---
+
+<a href={`/resources/${resource.slug}`}>
+  <div
+    class="card h-full opacity-100 flex-col items-center shadow-lg duration-300 hover:drop-shadow-xl hover:scale-105 m-4"
+  >
+    <div
+      class="rounded-tl-3xl rounded-tr-3xl border-t h-48 lg:h-auto flex-none bg-cover text-center overflow-hidden card-image"
+      style={{ backgroundImage: `url(${resource.data.image.src})` }}
+      title="Woman holding a mug"
+    >
+    </div>
+    <div
+      class="border-gray-400 lg:border-l-0 bg-white p-4 flex flex-col leading-normal card-content"
+    >
+      <div class="flex flex-row justify-between">
+        <p class="mt-8">{resource.data.author.toUpperCase()}</p>
+        <Image style="width:50px" alt="arm logo" src={armLogo} />
+      </div>
+      <h3 class="font-normal">{resource.data.title}</h3>
+      <p class="text-[#6c757d] text-base">{dateString}</p>
+      <p class="truncate-text">
+        {resource.data.description ? resource.data.description : resource.body}
+      </p>
+    </div>
+  </div>
+</a>
+<style>
+  .card-image {
+    background-size: cover;
+    min-height: 300px;
+  }
+  .card-content {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+</style>

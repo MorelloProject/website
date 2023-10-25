@@ -1,0 +1,224 @@
+---
+import Footer from "@/components/footer/Footer.astro";
+import BaseHead from "@/components/head/BaseHead.astro";
+import NavBar from "@/components/nav/NavBar.astro";
+import { getCollection } from "astro:content";
+import PostHeader from "./../../components/resources/ResourceHeader.astro";
+
+export async function getStaticPaths({}) {
+  const resources = await getCollection("resources");
+
+  const paths = resources.map((resource) => ({
+    params: {
+      res: resource.slug,
+    },
+    props: {
+      resource,
+    },
+  }));
+  return paths;
+}
+
+const { resource } = Astro.props;
+
+console.log(resource);
+
+const { Content } = await resource.render();
+---
+
+<html lang="en">
+  <BaseHead
+    title={resource.data.title}
+    description={resource.data.description}
+  />
+  <body class="min-h-screen flex flex-col bg-white">
+    <NavBar />
+    <div class="text-left p-4">
+      <h1 class="text-[2em] font-medium mx-auto max-w-5xl px-2 md:px-8">
+        {resource.data.title}
+      </h1>
+    </div>
+    <PostHeader data={resource} />
+    <div
+      class="prose-xl md-content max-w-5xl first-line:text-left p-4 md:p-12 blog-content mx-auto"
+    >
+      <Content />
+    </div>
+    <Footer />
+    <script
+      type="text/javascript"
+      src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"></script>
+    <style is:global lang="scss">
+      .md-content {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        .developer {
+          @media screen and (max-width: 788px) {
+            overflow-x: auto;
+            white-space: nowrap;
+          }
+        }
+
+        p {
+          font-size: 20px;
+        }
+        ul {
+          list-style-type: disc;
+          margin-bottom: 20px;
+          li {
+            font-size: x-large;
+            color: black;
+          }
+        }
+
+        .copy-code {
+          padding: 0 !important;
+          width: 100%;
+          display: flex;
+          justify-content: right;
+          align-items: right;
+
+          img {
+            width: 20px;
+            color: white;
+            background-color: #ededed;
+            transition: background-color 0.3s ease;
+            // position: relative;
+            // z-index: 9999;
+          }
+          img:hover {
+            background-color: #00b1df;
+          }
+        }
+
+        blockquote {
+          background-color: #ededed;
+          border-left: 8px solid #00b1df;
+          color: #555555;
+          margin-top: 10px;
+          margin-bottom: 10px;
+          display: flex;
+          flex-direction: column;
+          align-items: left;
+          padding: 15px;
+          margin-left: 20px;
+          font-style: italic !important;
+          font-size: 20px;
+          width: 100%;
+          @media screen and (max-width: 788px) {
+            margin-left: auto;
+            margin-right: auto;
+            padding: 3px;
+          }
+
+          .signed-off {
+            background-color: black;
+            color: white;
+          }
+
+          div.content-wrapper {
+            display: flex;
+            flex: 1;
+            align-items: flex-start;
+          }
+
+          pre {
+            flex: 1;
+            background-color: black;
+            padding: 20px;
+            margin-left: 10px;
+            position: relative;
+            align-items: center;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+
+            @media screen and (max-width: 788px) {
+              overflow-x: auto;
+              white-space: nowrap;
+            }
+
+            .copy-code {
+              padding: 0 !important;
+              width: 100%;
+              display: flex;
+              justify-content: right;
+              align-items: right;
+
+              img {
+                width: 20px;
+                color: white;
+                background-color: #ededed;
+                transition: background-color 0.3s ease;
+              }
+              img:hover {
+                background-color: #00b1df;
+              }
+            }
+          }
+          code {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            width: 100% !important;
+            margin-left: 5px;
+          }
+        }
+      }
+    </style>
+    <script>
+      let copyButtonLabel = "Copy Code";
+      let copyButtonImageSrc = "../../src/assets/images/clipboard-copy.svg";
+      let codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+      for (let codeBlock of codeBlocks) {
+        let wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+
+        let copyButton = document.createElement("button");
+        copyButton.className = "copy-code ";
+        copyButton.setAttribute("type", "button");
+        copyButton.setAttribute("data-te-toggle", "tooltip");
+        copyButton.setAttribute("data-te-placement", "bottom");
+        copyButton.setAttribute("data-te-ripple-init", "");
+        copyButton.setAttribute("data-te-ripple-color", "light");
+        copyButton.setAttribute("title", "Copy Code");
+
+        let copyButtonImage = document.createElement("img");
+        copyButtonImage.src = copyButtonImageSrc;
+        copyButtonImage.alt = copyButtonLabel;
+        copyButtonImage.className = "w-5 h-5";
+        copyButton.appendChild(copyButtonImage);
+
+        let tooltip = document.createElement("span");
+        tooltip.className =
+          "hidden bg-black text-white text-sm py-1 px-2 rounded absolute bottom-full left-full transform translate-x-0 translate-y-20 group-hover:block";
+        tooltip.innerText = copyButtonLabel;
+        copyButton.appendChild(tooltip);
+
+        codeBlock.setAttribute("tabindex", "0");
+        codeBlock.appendChild(copyButton);
+        // wrap code block with relative parent element
+        codeBlock.parentNode?.insertBefore(wrapper, codeBlock);
+        wrapper.appendChild(codeBlock);
+
+        copyButton.addEventListener("click", async () => {
+          await copyCode(codeBlock, copyButton);
+        });
+      }
+
+      async function copyCode(block: any, button: any) {
+        let code = block.querySelector("code");
+        let text = code.innerText;
+
+        await navigator.clipboard.writeText(text);
+
+        // visual feedback that task is completed
+        button.innerText = "Code Copied";
+
+        setTimeout(() => {
+          button.innerHTML = `<img src="${copyButtonImageSrc}">`;
+        }, 700);
+      }
+    </script>
+  </body>
+</html>

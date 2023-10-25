@@ -1,36 +1,35 @@
 ---
-const { data } = Astro.props;
+const { resource } = Astro.props;
 import dayjs from "dayjs";
-console.log("data is", data);
+
 import { Image } from "astro:assets";
 import armLogo from "../../assets/images/content/arm-logo.jpg";
-console.log(data.image);
 
-const dateObj = dayjs(data.date);
+const dateObj = dayjs(resource.data.date);
 const dateString = dateObj.format("dddd, MMMM D, YYYY");
 ---
 
 <div
-  class="rounded-lg max-w-sm w-full lg:max-w-full lg:flex lg:flex-row-reverse mx-auto justify-center"
+  class="card w-full lg:max-w-full flex flex-col lg:flex-row-reverse mx-auto justify-center"
 >
   <div
-    class="border-r w-2/3 h-48 lg:h-auto lg:w-2/3 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden card-image"
-    style={{ backgroundImage: `url(${data.image.src})` }}
+    class="opacity-100 rounded-tr-3xl rounded-tl-3xl lg:rounded-tl-none lg:rounded-tr-3xl lg:rounded-br-3xl h-48 lg:h-auto lg:w-2/3 flex-none bg-cover text-center overflow-hidden card-image"
+    style={{ backgroundImage: `url(${resource.data.image.src})` }}
     title="Woman holding a mug"
   >
   </div>
   <div
-    class="border-l w-1/3 border-b border-t border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col leading-normal card-content"
+    class="lg:w-1/3 rounded-br-3xl rounded-bl-3xl lg:rounded-tl-3xl lg:rounded-bl-3xl border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col leading-normal card-content"
   >
     <div class="flex flex-row justify-between">
-      <p class="mt-8">{data.author.toUpperCase()}</p>
+      <p class="mt-8">{resource.data.author.toUpperCase()}</p>
       <Image style="width:50px" alt="arm logo" src={armLogo} />
     </div>
-    <h3 class="font-normal">{data.title}</h3>
+    <h3 class="font-normal">{resource.data.title}</h3>
     <p class="text-[#6c757d] text-base">{dateString}</p>
-    <p>{data.description}</p>
+    <p>{resource.data.description}</p>
     <a
-      href={`/resources/${data.author}`}
+      href={`/resources/${resource.slug}`}
       class="text-white !important bg-[#273548] p-2 w-20 rounded text-center"
       >Read</a
     >

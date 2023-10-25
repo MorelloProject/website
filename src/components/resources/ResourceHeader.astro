@@ -1,0 +1,41 @@
+---
+import { Image } from "astro:assets";
+import logo from "../../assets/images/content/arm-logo.jpg";
+import dayjs from "dayjs";
+import { getEntry } from "astro:content";
+import { getEntries } from "astro:content";
+
+const { data } = Astro.props;
+
+const dateObj = dayjs(data.date);
+const dateString = dateObj.format("dddd, MMMM D, YYYY");
+
+const readTime = `${Math.ceil(
+  data.data.description.split(" ").length / 183
+)} min read`;
+---
+
+<div class="bg-[#f8f9fa]">
+  <div class="mx-auto py-4 md:max-w-[1200px] w-auto">
+    <div class="flex flex-wrap">
+      <div
+        class="flex md:flex-row flex-col max-w-[1800px] items-center mx-auto md:mx-0"
+      >
+        <div class="w-48 overflow-clip rounded-full ">
+          <Image class="object-cover"  src={logo} alt="logo" />
+        </div>
+        <div class="flex flex-col ml-4 text-md">
+          <!-- Added ml-4 for spacing -->
+          <div>
+            <div class="mx-2 p-3">
+              <strong class="pr-4">{data.data.author}</strong> |
+              <span class="px-4 font-normal">{dateString}</span> | <span
+                class="font-bold pr-4">{readTime}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
