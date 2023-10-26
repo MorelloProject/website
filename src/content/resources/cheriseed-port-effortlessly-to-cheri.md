@@ -5,172 +5,42 @@ date: 2022-12-08 12:00:00
 category: resources
 description: Enabling users to run CHERI semantics within non-CHERI architecture. A tool to detect capability violations and help users port their codebase to CHERI.
 image: ../../assets/images/content/Security_screen.jpg
-extra:
-  head: |
-    <style type="text/css">
-      article {
-        position: relative;
-      }
-      #wrapper {
-        text-align: justify;
-      }
-      #wrapper h1 + p,
-      #wrapper h3 + p {
-        text-indent: 18px;
-      }
-      #wrapper .highlight pre {
-        border-radius: 5px;
-        background-color: #262934;
-      }
-      #wrapper .highlight pre .lineno {
-        padding: 0 15px;
-        color: #616780;
-      }
-      #wrapper .highlight pre code {
-        color: #f3f5f5;
-      }
-      #wrapper .highlight pre code .cpf {
-        color: #a0a0a0;
-      }
-      #wrapper .highlight pre code .cp {
-        color: #efefef;
-      }
-      #wrapper .highlight pre code .cm,
-      #wrapper .highlight pre code .c1 {
-        color: #25a112;
-      }
-      #wrapper .language-diff .p {
-        color: #01b4cc;
-      }
-      html {
-        scroll-padding-top: 150px;
-      }
-      #sidebar-cheriseed {
-        font-size: 14px;
-        height: 100%;
-        width: 15%;
-        top:300px;
-        left: 0;
-        margin-left: 10px;
-        padding-right: 40px;
-      }
-      #sidebar-cheriseed>li>a {
-          color:grey;
-          text-align: left;
-          border-left: 2px solid transparent;
-      }
-      #sidebar-cheriseed>.active>a,
-      #sidebar-cheriseed>li>a:hover,
-      #sidebar-cheriseed>li>a:focus {
-          color: black;
-          text-decoration: none;
-          background-color: #eaeaea;
-          border-left: 1px solid #273548;
-      }
-      #sidebar-cheriseed>.active>a,
-      #sidebar-cheriseed>.active:hover>a,
-      #sidebar-cheriseed>.active:focus>a {
-          background-color: transparent;
-          font-weight: 500;
-          border-left: 3px solid #273548;
-      }
-      .sidebar-cheriseed-2>a {
-        font-size: 13px;
-        padding-left: 35px;
-      }
-      #exampleModal p {
-        padding: 0 10px;
-        text-indent: 18px;
-      }
-      #buildModal p {
-        padding: 0 10px;
-      }
-      @media (max-width: 1000px) {
-        #sidebar-cheriseed {
-          display: none;
-        }
-      }
-    </style>
-    <script type="text/javascript">
-      function getAllHeadings(entry){
-          var id = entry.target.getAttribute('id');
-          return document.querySelector('#sidebar-cheriseed li a[href="#'+id+'"]');
-      }
-      window.addEventListener('DOMContentLoaded', () => {
-        var curr = null;
-        const observer = new IntersectionObserver(entries => {
-          entries.forEach(entry => {
-            if (getAllHeadings(entry) != null) {
-              var clist = getAllHeadings(entry).parentElement.classList;
-              if (entry.intersectionRatio > 0) {
-                clist.add('showing-sidebar');
-              } else {
-                clist.remove('showing-sidebar');
-              }
-            }
-          });
-          var showing = document.querySelectorAll('.showing-sidebar');
-          if(showing.length > 0) {
-            if (curr !== null ) curr.classList.remove('active');
-            showing[0].classList.add('active');
-            curr = showing[0];
-          }
-        });
+flow:
+  - row: container_row
+    style: bg-light morello-content
+    sections:
+      - component: text
+        style: bg-white p-2 my-3
+        text_content:
+          text: |-
+            # CHERI - Overview
 
-        document.querySelectorAll('h1[id], h3[id]').forEach((section) => {
-          observer.observe(section);
-        });
-        document.querySelectorAll('.highlight pre.highlight figure').forEach((section) => {
-          var d = section.querySelector('figure.highlight pre');
-          section.outerHTML = d.innerHTML;
-        });
-        document.querySelectorAll('.remove-copyright pre.highlight code').forEach((section) => {
-          var startReading = false;
-          var commentStarted = false;
-          var formatted_text = '';
-          section.innerHTML.split("\n").forEach(line => {
-            if (!startReading) {
-              if (!commentStarted && line.includes('/*'))
-                commentStarted = true;
-              if (commentStarted && line.includes('*/'))
-                startReading = true;
-              if (commentStarted)
-                return;
-            }
-            formatted_text += line + '\n';
-          });
-          console.log(formatted_text);
-          section.innerHTML = formatted_text.replace(/\n$/, '');
-        });
-      });
-    </script>
+            Current CPU architectures require strong software support for memory and address-space management, increasing the overhead and complexity to make systems more secure. Preventing, or even just mitigating, exploitation of software bugs in the systems results in inefficient and increasingly expensive software support.
+
+            CHERI-based architecture introduces hardware-supported security features using explicit capability model with bounded memory access and additional properties to limit unauthorized memory exploitations. All memory within an address space in such an architecture can be accessed via one of two kinds of capabilities, with one of the types used in load/store instructions to access data or other capabilities, and the other one - for transition between protection domains via invoking call/return instructions[^ref1] [^ref2]. To find out more about memory protection, check this [post] [morello-page].
+
+            # CHERIseed – Introduction
+
+            While CHERI introduces strong security features, it also requires tweaking the programming model to ensure capability provenance validity, monotonicity and to resolve other capability related faults. So, migrating your project to enable the use of the CHERI features could be a bit tedious. To overcome this deterrence and to facilitate the porting effort of existing code to CHERI hardware platform we are introducing CHERIseed.
+
+            CHERIseed is a software-only implementation of CHERI C/C++ semantics[^ref3]. It provides some CHERI functionality while running your project on a host machine that is not capability aware. This tool helps decrease complexity of porting to CHERI hardware by helping developers learn and identify potentially unsafe code that would fault on real CHERI hardware. CHERI C/C++ is relatively new and CHERIseed helps in step-by-step introduction of CHERI into any code base. CHERIseed provides the following key functionalities:
+
+            - An interface to modify and retrieve capability properties using CHERI APIs,
+            - 128-bit capability representation for a 64-bit address space and
+            - Tags, bounds and permissions checking on pointer dereferences.
+
+            CHERIseed is a semantic implementation of CHERI C/C++ which provides developers that have access to widely used architectures to modify their codebase and add support for CHERI. Hence, CHERIseed does not emulate CHERI hardware, it uses a third-party library to encode/decode capabilities. CHERIseed does not provide similar security guarantees as CHERI hardware and should not be used as a replacement security enforcing tool. This tool includes features to detect CHERI violations like untagged, out-of-bounds access and invalid permission violations, and provides detailed description of these faults for efficient debugging of the ported software - for details, refer [CHERIseed.rst] [cheriseed-rst]. Because of the nature of code instrumentation, CHERIseed does not provide any performance advantage over the real hardware and should not be used for performance benchmarking.
+
+            # Bringing CHERIseed to your Project
+
+            This section explores the use of CHERIseed by demonstrating how it displays a CHERI violation and how it helps to fix a bug. A simple example, which runs without issues, produces a capability violation when compiled with CHERIseed enabled, revealing a bug. Currently, CHERIseed allows to build and run static and dynamically linked applications on `aarch64` or `x86` machines. See [CHERI C/C++ Programming Guide] [pro-guide], for more details.
+
+            ### Source – [string.c](source-link)
 ---
 
 <!-------------------------- MAIN CONTENT ------------------------------------->
 
-# CHERI - Overview
-
-Current CPU architectures require strong software support for memory and address-space management, increasing the overhead and complexity to make systems more secure. Preventing, or even just mitigating, exploitation of software bugs in the systems results in inefficient and increasingly expensive software support.
-
-CHERI-based architecture introduces hardware-supported security features using explicit capability model with bounded memory access and additional properties to limit unauthorized memory exploitations. All memory within an address space in such an architecture can be accessed via one of two kinds of capabilities, with one of the types used in load/store instructions to access data or other capabilities, and the other one - for transition between protection domains via invoking call/return instructions[^ref1] [^ref2]. To find out more about memory protection, check this [post] [morello-page].
-
-# CHERIseed – Introduction
-
-While CHERI introduces strong security features, it also requires tweaking the programming model to ensure capability provenance validity, monotonicity and to resolve other capability related faults. So, migrating your project to enable the use of the CHERI features could be a bit tedious. To overcome this deterrence and to facilitate the porting effort of existing code to CHERI hardware platform we are introducing CHERIseed.
-
-CHERIseed is a software-only implementation of CHERI C/C++ semantics[^ref3]. It provides some CHERI functionality while running your project on a host machine that is not capability aware. This tool helps decrease complexity of porting to CHERI hardware by helping developers learn and identify potentially unsafe code that would fault on real CHERI hardware. CHERI C/C++ is relatively new and CHERIseed helps in step-by-step introduction of CHERI into any code base. CHERIseed provides the following key functionalities:
-
-- An interface to modify and retrieve capability properties using CHERI APIs,
-- 128-bit capability representation for a 64-bit address space and
-- Tags, bounds and permissions checking on pointer dereferences.
-
-CHERIseed is a semantic implementation of CHERI C/C++ which provides developers that have access to widely used architectures to modify their codebase and add support for CHERI. Hence, CHERIseed does not emulate CHERI hardware, it uses a third-party library to encode/decode capabilities. CHERIseed does not provide similar security guarantees as CHERI hardware and should not be used as a replacement security enforcing tool. This tool includes features to detect CHERI violations like untagged, out-of-bounds access and invalid permission violations, and provides detailed description of these faults for efficient debugging of the ported software - for details, refer [CHERIseed.rst] [cheriseed-rst]. Because of the nature of code instrumentation, CHERIseed does not provide any performance advantage over the real hardware and should not be used for performance benchmarking.
-
-# Bringing CHERIseed to your Project
-
-This section explores the use of CHERIseed by demonstrating how it displays a CHERI violation and how it helps to fix a bug. A simple example, which runs without issues, produces a capability violation when compiled with CHERIseed enabled, revealing a bug. Currently, CHERIseed allows to build and run static and dynamically linked applications on `aarch64` or `x86` machines. See [CHERI C/C++ Programming Guide] [pro-guide], for more details.
-
-### Source – [string.c](source-link)
+<div class='fetch_data'></div>
 
 `https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/491db32a6a29fdc33144a2baeb82850094ee9866/cheriseed/001-blogpost/string/string.c`
 

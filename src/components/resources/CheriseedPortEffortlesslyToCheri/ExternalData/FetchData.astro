@@ -1,0 +1,78 @@
+---
+import Prism from "prismjs";
+import "prismjs/components/prism-c";
+import loadLanguages from "prismjs/components/";
+loadLanguages(["c"]);
+
+const { data } = Astro.props;
+
+const fetchData = async (url: string) => {
+  const response = await fetch(url);
+  const data = await response.text();
+  return data;
+};
+
+const codeData = await fetchData(data);
+
+const html = Prism.highlight(codeData, Prism.languages.c, "c");
+const cleanedCodeData = html.replace(/<\/?span(?: class="[^\"]+")?>/g, "");
+const finalCodeData = cleanedCodeData.replace(/&lt;/g, "<");
+---
+
+<div id="codeContainer" class="line-numbers">
+  <pre
+    class="language-c line-numbers">
+    <div id="highlight">{finalCodeData}</div>
+  </pre>
+</div>
+<style>
+  #codeContainer {
+    background-color: #262934;
+    color: white;
+    border-radius: 1%;
+  }
+
+  #code,
+  #highlight {
+    line-height: 1.5;
+  }
+  pre .line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+  }
+
+  pre .line-numbers > code {
+    position: relative;
+    white-space: inherit;
+  }
+
+  .line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .line-numbers-rows > span {
+    display: block;
+    counter-increment: linenumber;
+  }
+
+  .line-numbers-rows > span:before {
+    content: counter(linenumber);
+    color: #999;
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
+  }
+</style>

@@ -1,0 +1,316 @@
+---
+---
+
+import FetchData from "../../components/resources/CheriseedPortEffortlesslyToCheri/ExternalData/FetchData.astro";
+import CodeLayout from "../../components/resources/CheriseedPortEffortlesslyToCheri/CodeLayout.astro";
+import Navigation from "../../components/resources/CheriseedPortEffortlesslyToCheri/Navigation.astro";
+
+<Navigation />
+
+# CHERI - Overview
+
+Current CPU architectures require strong software support for memory and address-space management, increasing the overhead and complexity to make systems more secure. Preventing, or even just mitigating, exploitation of software bugs in the systems results in inefficient and increasingly expensive software support.
+
+CHERI-based architecture introduces hardware-supported security features using explicit capability model with bounded memory access and additional properties to limit unauthorized memory exploitations. All memory within an address space in such an architecture can be accessed via one of two kinds of capabilities, with one of the types used in load/store instructions to access data or other capabilities, and the other one - for transition between protection domains via invoking call/return instructions[^ref1] [^ref2]. To find out more about memory protection, check this [post] [morello-page].
+
+# CHERIseed – Introduction
+
+While CHERI introduces strong security features, it also requires tweaking the programming model to ensure capability provenance validity, monotonicity and to resolve other capability related faults. So, migrating your project to enable the use of the CHERI features could be a bit tedious. To overcome this deterrence and to facilitate the porting effort of existing code to CHERI hardware platform we are introducing CHERIseed.
+
+CHERIseed is a software-only implementation of CHERI C/C++ semantics[^ref3]. It provides some CHERI functionality while running your project on a host machine that is not capability aware. This tool helps decrease complexity of porting to CHERI hardware by helping developers learn and identify potentially unsafe code that would fault on real CHERI hardware. CHERI C/C++ is relatively new and CHERIseed helps in step-by-step introduction of CHERI into any code base. CHERIseed provides the following key functionalities:
+
+- An interface to modify and retrieve capability properties using CHERI APIs,
+- 128-bit capability representation for a 64-bit address space and
+- Tags, bounds and permissions checking on pointer dereferences.
+
+CHERIseed is a semantic implementation of CHERI C/C++ which provides developers that have access to widely used architectures to modify their codebase and add support for CHERI. Hence, CHERIseed does not emulate CHERI hardware, it uses a third-party library to encode/decode capabilities. CHERIseed does not provide similar security guarantees as CHERI hardware and should not be used as a replacement security enforcing tool. This tool includes features to detect CHERI violations like untagged, out-of-bounds access and invalid permission violations, and provides detailed description of these faults for efficient debugging of the ported software - for details, refer [CHERIseed.rst] [cheriseed-rst]. Because of the nature of code instrumentation, CHERIseed does not provide any performance advantage over the real hardware and should not be used for performance benchmarking.
+
+# Bringing CHERIseed to your Project
+
+This section explores the use of CHERIseed by demonstrating how it displays a CHERI violation and how it helps to fix a bug. A simple example, which runs without issues, produces a capability violation when compiled with CHERIseed enabled, revealing a bug. Currently, CHERIseed allows to build and run static and dynamically linked applications on `aarch64` or `x86` machines. See [CHERI C/C++ Programming Guide] [pro-guide], for more details.
+
+### Source – [string.c](source-link)
+
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/491db32a6a29fdc33144a2baeb82850094ee9866/cheriseed/001-blogpost/string/string.c" />
+
+### Compiling
+
+Check the <a data-toggle="modal" data-target="#buildModal">musl-libc build</a> to see how to setup the environment to build CHERIseed on your machine.
+Compile `string.c` on the host machine using the flags `-fsanitize=cheriseed` to enable CHERIseed and `-cheri-bounds=subobject-safe` to enable enforcements on C-language objects within allocations.
+
+```bash
+'$> ${CC} \
+  --target=${TARGET_TRIPLE} \
+-rtlib=compiler-rt \
+--sysroot="${MUSL_PREFIX}" \
+-lc -lpthread -lm -lrt \
+-fuse-ld=lld \
+-fsanitize=cheriseed \
+-mabi=purecap\
+-static \
+-cheri-bounds=subobject-safe \
+string.c -o string.bin'
+```
+
+Pure Capability (`purecap`) is a new ABI which requires pre-ported `libc` support. This mode indicates that all pointers should automatically be represented as a capability, without the need for `__capability` annotations. Use the flag `-mabi=purecap` to compile in purecap.
+
+<CodeLayout>
+  <div class="card-header">Design</div>
+  CHERIseed is based on LLVM project, and it is composed of LLVM module pass and
+  compiler runtime. The input of the module pass is LLVM IR generated for CHERI,
+  and it replaces IR instruction operating on capabilities. This design decision
+  should enable CHERIseed to run on any given platform. The following is an example
+  of how CHERIseed input IR is modified by CHERIseed:
+
+{" "}
+
+<p>
+  <b>
+    <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_source.c">
+      Source
+    </a>
+  </b>
+</p>
+
+{" "}
+
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_source.c" />
+
+{" "}
+
+<p>
+  <b>
+    <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_llvm_ir_1.txt">
+      Input IR
+    </a>
+  </b>
+</p>
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_llvm_ir_1.txt" />
+
+{" "}
+
+<p>
+  <b>
+    <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_llvm_ir_2.txt">
+      Output IR
+    </a>
+  </b>
+</p>
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_design_llvm_ir_2.txt" />
+
+The address space of CHERI is 128-bit (on 64-bit host) and CHERIseed abstracts capability with a 16-byte aligned <span style='color=#e83e8c'>\_\_cheriseed_cap_t</span>. The CHERIseed capabilities are compressed into two 64-bit values. An integer address of the 64 bits (value) and additional 64 bits (metadata) contributing to the protection model such as bounds, permissions, object type. Additionally, there is a 1-bit validity tag to track the validity of a capability. Compiler-rt implements CHERI intrinsic functions along with few CHERIseed APIs. Runtime APIs makes use of <span style='color=#e83e8c'>cheri-compressed-cap</span> library to compress and decompress metadata of a capability. To learn more about the CHERIseed design refer to <a href="https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/docs/CHERIseedDesign.rst">CHERIseedDesign.rst</a>.
+
+</CodeLayout>
+
+### Adapting to CHERI
+
+Now we have successfully compiled the source with CHERIseed. Run the program and use `gdb` to inspect the issue.
+
+```
+(gdb) run
+Starting program: /home/cheriseed-workspace/string.bin
+
+================================================================
+Runtime Error detected by CHERIseed
+
+Capability is untagged at 0x77fff7febb60:
+
+0x0000002050db [0x000000000000-0xffffffffffffffff] (invalid)
+
+Tag address was at 0x7f7ff77eebb6
+
+Shadow memory layout:
+low [0x77fff7ff0000-0x7f7ff77ef000]
+gap [0x7f7ff77ef000-0x7ffff77ef000]
+high [0x7ffff77ef000-0x7ffff7ff0000]
+
+# tid: 12868
+================================================================
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000023309 in morello::shim::svc_impl () at src/svc.cpp:54
+54 in src/svc.cpp
+```
+
+We have encountered CHERIseed runtime error specifying which CHERI violation is at fault, which line triggered the fault and details regarding the capability responsible in order to provide useful information during the debugging session.
+
+Following is an overview of how we represent a capability string.
+
+```
+<address> [<permissions>,<base>-<top>] (<attr>)
+```
+
+To read more about the capability string representation used, see [Display Capabilities] [cap-display-format]. Interpreting the above error message tells that capability at `0x77fff7febb60` is invalid with the value `0x0000002050db`.
+
+<CodeLayout>
+```<div class="card-header">Note</div>
+(gdb) x/2xg 0x77fff7febb60
+0x77fff7febb60: 0x0000002050db 0x000000000000
+(gdb) x/s 0x0000002050db
+0x2050db:       "This is a string"
+```
+The address used by the function is not the address of the pointer but of the capability where the address of the pointer is stored. This additional level of indirection should be kept in mind while debugging using CHERIseed.
+
+</CodeLayout>
+
+Based on the nature of the violation, a `SIGSEGV` or `SIGBUS` signal is raised when CHERIseed detects violation of capability semantics at runtime. These signals can have different signal codes depending on the type of violation. CHERIseed handles violations by giving intuitive and elaborate information related to the error. To know more about different behaviors supported by CHERIseed, refer to [CHERIseed.rst] [cheriseed-rst].
+
+Inspecting the CHERIseed error message further, we see a `SIGSEGV` is raised because the capability is untagged. According to the CHERI design, capabilities should have an associated tag bit that can be cleared to mark a capability as invalid. This aims to ensure that operations with a capability can only be performed if that capability is derived through valid transformations of valid capabilities. Please refer to the [CHERIseed Design Doc] [cheriseed-design-rst] to see how CHERIseed supports capability tags.
+
+Furthermore, we can choose how CHERIseed should behave when it encounters semantic rule violations, i.e., it is possible to configure which checks are disabled at compile time (using compiler flags) or at runtime (using APIs or environment variables). For compile-time configuration of the checks, use the clang option `-fsanitize-cheriseed-checks` with a valid value string - compile-time configuration of the checks can be different per source module. For our case, let us try runtime configuration to enable all but tag checks using environment variable `CHERISEED_CHECKS` which controls how CHERIseed behaves without the need to recompile the application.
+
+(gdb) set environment CHERISEED_CHECKS=-TAG
+(gdb) run
+Starting program: /home/cheriseed-workspace/string.bin
+
+================================================================
+Runtime Error detected by CHERIseed
+
+Capability is missing required permission(s) at 0x77fff7febb60:
+
+0x0000002050db [0x000000000000-0xffffffffffffffff] (invalid)
+
+Missing permission(s):
+r [LOAD]
+
+Tag address was at 0x7f7ff77eebb6
+
+Shadow memory layout:
+low [0x77fff7ff0000-0x7f7ff77ef000]
+gap [0x7f7ff77ef000-0x7ffff77ef000]
+high [0x7ffff77ef000-0x7ffff7ff0000]
+
+# tid: 13167
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000023309a in morello::shim::svc_impl () at src/svc.cpp:54
+54 in src/svc.cpp```
+
+The message tells that the load permission is missing from the capability while a capability load is required to execute the line. This was already understood since the previous error message displayed that the capability is untagged with invalid bounds and no permissions.
+Alternatively, we can use `__cheriseed_control_checks()` API for runtime checks. The first argument specifies if the checks set in the second argument are to be enabled or disabled. The API `__cheriseed_control_semantics()` enables or disables all CHERI semantics at once. For more details see [CHERIseed.rst] [cheriseed-rst]. For example, we can try to scope checks for `new_string()` invocation as followed.
+
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_config_control.c" />
+
+Printing the stack trace,
+
+```
+(gdb) where
+#0 0x000000000023309a in morello::shim::svc_impl () at src/svc.cpp:54
+#1 0x000000000023301a in morello::shim::svc (arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=..., nr=&lt;optimised out&gt;, cg=...) at src/svc.cpp:183
+#2 0x0000000000238c38 in morello::shim::syscall (arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=..., nr=&lt;optimised out&gt;, cg=...) at build/gen/src/syscall.cpp:370
+#3 0x000000000023baef in **shim_syscall (cg=..., nr=&lt;optimised out&gt;, arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=...) at build/gen/src/syscall.cpp:1031
+#4 0x000000000022c52f in Call () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_libc.cpp:139
+#5 0x000000000022bbde in Raise () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_libc.cpp:400
+#6 0x000000000022aa78 in RaiseSignal () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_errors.cpp:380
+#7 0x0000000000228ab1 in RaiseSignal&lt;**cheriseed::error::NotTaggedError, **cheriseed::LocalCap const&&gt; () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_errors.h:309
+#8 0x000000000022645c in NotTaggedViolation () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed.cpp:57
+#9 RequireTagged () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_local_cap.h:106
+#10 **cheriseed_check_access () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed.cpp:698
+#11 0x0000000000263aa9 in memchr (src=&lt;optimised out&gt;, c=&lt;optimised out&gt;, n=&lt;optimised out&gt;) at src/string/memchr.c:23
+#12 0x00000000002639af in strnlen (s=&lt;optimised out&gt;, n=&lt;optimised out&gt;) at src/string/strnlen.c:5
+#13 0x0000000000273246 in new_string () at string.c:30
+#14 0x000000000027345c in main () at string.c:41
+```
+
+Because of how CHERIseed handles runtime calls, in backtrace we can see extra items at the top of stack trace. In our case, frame 11 is the one in concern and it resulted in untagged capability violation because `str_addr` in the function `new_string()` holds a `long` value which cannot represent a capability. To read more about this CHERI violations see [section 6.1 of CHERI C/C++ Programmers guide] [pro-guide]. Change from `long` to `intptr_t` at Line 28 solves this issue.
+
+Running the program again gives the following output.
+
+```
+(gdb) run
+Starting program: /home/cheriseed-workspace/string.bin
+
+================================================================
+Runtime Error detected by CHERIseed
+
+Prevented out-of-bounds access with capability at 0x77fff7fe7e50:
+
+  0x77fff7fed050 [rwRW,0x77fff7fed040-0x77fff7fed050]
+
+Requested range was 0x77fff7fed050-0x77fff7fed051
+
+Tag address was at 0x7f7ff77ee7e5
+
+Shadow memory layout:
+  low   [0x77fff7ff0000-0x7f7ff77ef000]
+  gap   [0x7f7ff77ef000-0x7ffff77ef000]
+  high  [0x7ffff77ef000-0x7ffff7ff0000]
+
+tid: 15901
+================================================================
+
+Program received signal SIGSEGV, Segmentation fault.
+{{blue_c}}0x000000000023309a in {{yellow_c}}morello::shim::svc_impl () at src/svc.cpp:54
+54      src/svc.cpp: No such file or directory.
+(gdb) where -2
+#15 0x00000000002785ff in printf (fmt=&lt;optimised out&gt;) at src/stdio/printf.c:9
+#16 0x00000000002734c3 in {{yellow_c}}main () at after.c:43
+
+```
+
+In this case, we see that the program progressed further and now the capability referencing the `str_addr` has length `0x10` and the capability limit is at `0x77fff7fed050` but the program counter at `0x0000002734c3` is accessing the range `0x77fff7fed050`-`0x77fff7fed051`. Having a close look at the trace we find that we are getting out-of-bounds error because we write over whole data including delimiters. Hence, we have found an illegal out of bound access in the source. This can be mitigated by increasing one byte to string’s data to store an additional delimiter value.
+
+### Program is now more CHERI-ready
+
+Finally, we have the source running successfully using CHERIseed and we can say the program is now more CHERI-ready, i.e., that the source can be built and run on CHERI hardware. CHERIseed made it easy for us interpret the bug by giving elaborate details of the which operation failed and which capability was to be corrected etc.
+
+The [fix] [https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/146adba8e351c47069763286dd2d99e3931b64b6.diff]:
+
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/4ce0ecbfdb129a37e3d26aa7cfed966bcc7f47e1.diff" />
+
+<CodeLayout>
+  <div class="card-header">Using CHERI-related headers</div>
+  Let’s say we need the data of the string to be unmodifiable after we initialize
+  them. CHERI compiler builtins are provided for accessing/modifying capability properties
+  of pointers. For our use case, we can remove store permissions of the capability
+  using cheri_perms_and() API.
+  <FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_cheri_header.c" />
+  There are a set of builtin functions which provides access to capability properties.{" "}
+  <a href="https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/lib/Headers/cheriintrin.h">
+    cheriintrin.h{" "}
+  </a>
+  provides interface to access and modify those properties including few
+  capability permission constants. To learn more about this, see Sections 7 of
+  the
+  <a href="https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf">
+    CHERI C/C++ Programming Guide.
+  </a>
+  The compiler emits few warnings about the uses of improper casts which can be
+  resolved easily.
+</CodeLayout>
+
+# Other Examples
+
+<p>
+  1.{" "}
+  <a data-toggle="modal" data-target="#exampleModal">
+    Fiestel cipher example
+  </a>
+</p>
+
+# Limitations
+
+As mentioned in the introduction, CHERIseed should not be considered a replacement for hardware-enforced CHERI. Also, CHERIseed considers inline assembly snippets as “unsafe” because it cannot reason about what happens in the assembly. However, some forms of inline assembly are considered safe: compiler barriers and those which don’t take or return pointers. Some workarounds for these may include the use of compiler builtins, etc. to replace assembly with C/C++ code.
+Also, CHERIseed does not have support for the following currently (the list is not exhaustive) and these could be great additions:
+
+- Compiling without the flag `-mabi=purecap` is possible but CHERIseed hasn’t been sufficiently tested for Hybrid mode.
+- A memory access performed from a signal handler to the same location as was being accessed at the moment when signal is received is not supported yet.
+- Some more CHERI features are yet to be supported.
+
+CHERIseed is still in its alpha phase. We successfully used CHERIseed to debug CHERI compatibility issues, however there are still bugs to be found in the tool. Please report them using the <a href='https://git.morello-project.org/morello/llvm-project/-/issues/new?issue&issue[title]=CHERIseed:%20%3Csummary%3E&issue[description]=%3Cdetails%3E'> link </a>.
+
+For more details regarding CHERIseed limitations, <a href='https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/docs/CHERIseed.rst'>CHERIseed.rst</a>.
+
+# Inviting You to Collaborate and Contribute
+
+Thank you for your interest in CHERIseed. It still needs work to make it robust and we are inviting you to try it, share your feedback, request a feature, or contribute to the code if you have time. To get started with contributing to code, please read testing and other submission guidelines as mentioned in <a href='https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/docs/CHERIseed.rst'>CHERIseed contribute. </a>
+
+To file a ticket at issues tracker, follow <a href='https://git.morello-project.org/morello/llvm-project/-/issues/new?issue&issue[title]=CHERIseed:%20%3Csummary%3E&issue[description]=%3Cdetails%3E'>here</a>.
+
+_Copyright © 2022, Arm Ltd._
+
+# References
+
+[^ref1]: University of Cambridge, Computer Laboratory, 2014, Capability Hardware Enhanced RISC Instructions: CHERI Instruction-set architecture, Abstract, viewed October 2022 <a href='https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-850.pdf'>https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-850.pdf</a>
+[^ref2]: University of Cambridge, Computer Laboratory, 2020, Capability Hardware Enhanced RISC Instructions: CHERI Instruction-Set Architecture (Version 8), Chapter 2.4.5 “Source-Code and Binary Compatibility” viewed June 2021 <a href='https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.pdf'>https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.pdf</a>
+[^ref3]: University of Cambridge, Computer Laboratory, 2020, CHERI C/C++ Programming Guide, Section 2.1, viewed June 2021 <a href='https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf'>https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf</a>

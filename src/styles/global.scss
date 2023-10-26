@@ -63,3 +63,12 @@ html {
     }
   }
 }
+#footnote-label {
+  display: none;
+}
+.sidenav-custom {
+  width: 340px !important;
+  @media screen and (max-width: 1300px) {
+    width: 240px !important;
+  }
+}

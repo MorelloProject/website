@@ -90,6 +90,11 @@ const resources = defineCollection({
     }),
 });
 
+const cheri = defineCollection({
+  type: "content",
+  schema: z.any(),
+});
+
 const rows = defineCollection({
   type: "content",
   schema: z.object({
@@ -117,4 +122,5 @@ export const collections = {
   sections,
   data,
   resources,
+  cheri,
 };

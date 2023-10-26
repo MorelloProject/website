@@ -3,18 +3,19 @@ import Footer from "@/components/footer/Footer.astro";
 import BaseHead from "@/components/head/BaseHead.astro";
 import NavBar from "@/components/nav/NavBar.astro";
 import { getCollection } from "astro:content";
-import PostHeader from "./../../components/resources/ResourceHeader.astro";
+import PostHeader from "../../components/resources/ResourceHeader.astro";
+import CheriseedPortEffortlesslyToCheri from "@/components/resources/CheriseedPortEffortlesslyToCheri/index.astro";
 
 export async function getStaticPaths({}) {
   const resources = await getCollection("resources");
   const filteredResources = resources.filter(
     (resource) =>
-      resource.slug !== ("cheriseed-port-effortlessly-to-cheri" as string)
+      resource.slug == ("cheriseed-port-effortlessly-to-cheri" as string)
   );
 
   const paths = filteredResources.map((resource) => ({
     params: {
-      res: resource.slug,
+      cheri: resource.slug,
     },
     props: {
       resource,
@@ -42,9 +43,9 @@ const { Content } = await resource.render();
     </div>
     <PostHeader data={resource} />
     <div
-      class="prose-xl md-content max-w-5xl first-line:text-left p-4 md:p-12 blog-content mx-auto"
+      class="prose-xl max-w-7xl first-line:text-left p-4 md:p-12 blog-content mx-auto"
     >
-      <Content />
+      <CheriseedPortEffortlesslyToCheri />
     </div>
     <Footer />
     <script
@@ -200,7 +201,7 @@ const { Content } = await resource.render();
         codeBlock.setAttribute("tabindex", "0");
         codeBlock.appendChild(copyButton);
         // wrap code block with relative parent element
-        codeBlock.parentNode.insertBefore(wrapper, codeBlock);
+        codeBlock.parentNode?.insertBefore(wrapper, codeBlock);
         wrapper.appendChild(codeBlock);
 
         copyButton.addEventListener("click", async () => {
@@ -222,5 +223,10 @@ const { Content } = await resource.render();
         }, 700);
       }
     </script>
+    <script src="https://{{cdn}}/prismjs@v1.x/components/prism-core.min.js"
+    ></script>
+    <script
+      src="https://{{cdn}}/prismjs@v1.x/plugins/autoloader/prism-autoloader.min.js"
+    ></script>
   </body>
 </html>
