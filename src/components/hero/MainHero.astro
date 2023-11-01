@@ -1,22 +1,35 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import Cards from "./HeroCards.astro";
-import { Image } from "astro:assets";
 
-type Props = CollectionEntry<"pages">["data"]["hero"];
+interface Props {
+  description?: string;
+  background_image?: {
+    src: string;
+    width: number;
+    height: number;
+    format: "png" | "jpg" | "jpeg" | "tiff" | "webp" | "gif" | "svg" | "avif";
+  };
+  title?: string;
+  style?: any;
+  card_section?: any;
+  first_section?: any;
+  second_section?: any;
+  buttons?: any;
+  dark_title?: string;
+}
 
 const {
   title,
+  dark_title,
   description,
   background_image,
   style,
-  first_section,
-  second_section,
+  card_section,
   buttons,
 } = Astro.props!;
 ---
 
-<div class="h-full mb-10">
+<div class="h-full">
   <div
     class:list={[
       style,
@@ -26,12 +39,16 @@ const {
   >
     <div class="container lg:w-[800px] pt-10">
       {
-        background_image ? (
-          <h1 class="container text-5xl p-10 mt-10 text-center font-light bg-white text-dark border rounded ">
+        background_image && title ? (
+          <h1 class="container text-5xl p-10 mt-10 text-center font-light bg-white  text-dark border rounded ">
             {title}
           </h1>
+        ) : background_image && dark_title ? (
+          <h1 class="container text-5xl p-2 mt-10  font-light text-left text-dark  ">
+            {dark_title}
+          </h1>
         ) : (
-          <h1 class="container text-5xl  mt-10 text-left font-light  text-dark ">
+          <h1 class="container text-5xl  mt-10 text-left font-light   text-white ">
             {title}
           </h1>
         )
@@ -54,11 +71,7 @@ const {
       }
     </div>
 
-    {
-      first_section && second_section && (
-        <Cards first_section={first_section} second_section={second_section} />
-      )
-    }
+    {card_section && <Cards card_section={card_section} />}
   </div>
 </div>
 
@@ -66,7 +79,7 @@ const {
   define:vars={{
     backgroundUrl: background_image
       ? `url(${background_image.src})`
-      : "#d3d3d3",
+      : "#212529",
   }}
 >
   .hero-background {
@@ -89,7 +102,7 @@ const {
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: #d3d3d3;
+    background-color: black;
     color: dark;
     z-index: -1;
     height: 350px;

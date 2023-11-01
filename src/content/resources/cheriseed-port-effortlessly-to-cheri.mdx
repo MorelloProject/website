@@ -1,9 +1,16 @@
 ---
+author: arm
+title: CHERIseed – port effortlessly to CHERI
+date: 2022-12-08 12:00:00
+category: resources
+description: Enabling users to run CHERI semantics within non-CHERI architecture. A tool to detect capability violations and help users port their codebase to CHERI.
+image: ../../assets/images/content/Security_screen.jpg
 ---
 
 import FetchData from "../../components/resources/CheriseedPortEffortlesslyToCheri/ExternalData/FetchData.astro";
 import CodeLayout from "../../components/resources/CheriseedPortEffortlesslyToCheri/CodeLayout.astro";
 import Navigation from "../../components/resources/CheriseedPortEffortlesslyToCheri/Navigation.astro";
+import ExampleModel from "../../components/resources/CheriseedPortEffortlesslyToCheri/ExampleContent.astro";
 
 <Navigation />
 
@@ -56,6 +63,7 @@ Pure Capability (`purecap`) is a new ABI which requires pre-ported `libc` suppor
 
 <CodeLayout>
   <div class="card-header">Design</div>
+  <div class='p-6'>
   CHERIseed is based on LLVM project, and it is composed of LLVM module pass and
   compiler runtime. The input of the module pass is LLVM IR generated for CHERI,
   and it replaces IR instruction operating on capabilities. This design decision
@@ -100,6 +108,7 @@ Pure Capability (`purecap`) is a new ABI which requires pre-ported `libc` suppor
 
 The address space of CHERI is 128-bit (on 64-bit host) and CHERIseed abstracts capability with a 16-byte aligned <span style='color=#e83e8c'>\_\_cheriseed_cap_t</span>. The CHERIseed capabilities are compressed into two 64-bit values. An integer address of the 64 bits (value) and additional 64 bits (metadata) contributing to the protection model such as bounds, permissions, object type. Additionally, there is a 1-bit validity tag to track the validity of a capability. Compiler-rt implements CHERI intrinsic functions along with few CHERIseed APIs. Runtime APIs makes use of <span style='color=#e83e8c'>cheri-compressed-cap</span> library to compress and decompress metadata of a capability. To learn more about the CHERIseed design refer to <a href="https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/docs/CHERIseedDesign.rst">CHERIseedDesign.rst</a>.
 
+</div>
 </CodeLayout>
 
 ### Adapting to CHERI
@@ -143,14 +152,18 @@ Following is an overview of how we represent a capability string.
 To read more about the capability string representation used, see [Display Capabilities] [cap-display-format]. Interpreting the above error message tells that capability at `0x77fff7febb60` is invalid with the value `0x0000002050db`.
 
 <CodeLayout>
-```<div class="card-header">Note</div>
+<div class="card-header p-6">Note</div>
+<div class='p-6'>
+```
 (gdb) x/2xg 0x77fff7febb60
 0x77fff7febb60: 0x0000002050db 0x000000000000
 (gdb) x/s 0x0000002050db
 0x2050db:       "This is a string"
 ```
+
 The address used by the function is not the address of the pointer but of the capability where the address of the pointer is stored. This additional level of indirection should be kept in mind while debugging using CHERIseed.
 
+</div>
 </CodeLayout>
 
 Based on the nature of the violation, a `SIGSEGV` or `SIGBUS` signal is raised when CHERIseed detects violation of capability semantics at runtime. These signals can have different signal codes depending on the type of violation. CHERIseed handles violations by giving intuitive and elaborate information related to the error. To know more about different behaviors supported by CHERIseed, refer to [CHERIseed.rst] [cheriseed-rst].
@@ -159,6 +172,7 @@ Inspecting the CHERIseed error message further, we see a `SIGSEGV` is raised bec
 
 Furthermore, we can choose how CHERIseed should behave when it encounters semantic rule violations, i.e., it is possible to configure which checks are disabled at compile time (using compiler flags) or at runtime (using APIs or environment variables). For compile-time configuration of the checks, use the clang option `-fsanitize-cheriseed-checks` with a valid value string - compile-time configuration of the checks can be different per source module. For our case, let us try runtime configuration to enable all but tag checks using environment variable `CHERISEED_CHECKS` which controls how CHERIseed behaves without the need to recompile the application.
 
+```
 (gdb) set environment CHERISEED_CHECKS=-TAG
 (gdb) run
 Starting program: /home/cheriseed-workspace/string.bin
@@ -181,10 +195,12 @@ gap [0x7f7ff77ef000-0x7ffff77ef000]
 high [0x7ffff77ef000-0x7ffff7ff0000]
 
 # tid: 13167
+================================================================
 
 Program received signal SIGSEGV, Segmentation fault.
 0x000000000023309a in morello::shim::svc_impl () at src/svc.cpp:54
-54 in src/svc.cpp```
+54 in src/svc.cpp
+```
 
 The message tells that the load permission is missing from the capability while a capability load is required to execute the line. This was already understood since the previous error message displayed that the capability is untagged with invalid bounds and no permissions.
 Alternatively, we can use `__cheriseed_control_checks()` API for runtime checks. The first argument specifies if the checks set in the second argument are to be enabled or disabled. The API `__cheriseed_control_semantics()` enables or disables all CHERI semantics at once. For more details see [CHERIseed.rst] [cheriseed-rst]. For example, we can try to scope checks for `new_string()` invocation as followed.
@@ -217,6 +233,7 @@ Because of how CHERIseed handles runtime calls, in backtrace we can see extra it
 Running the program again gives the following output.
 
 ```
+
 (gdb) run
 Starting program: /home/cheriseed-workspace/string.bin
 
@@ -225,26 +242,25 @@ Runtime Error detected by CHERIseed
 
 Prevented out-of-bounds access with capability at 0x77fff7fe7e50:
 
-  0x77fff7fed050 [rwRW,0x77fff7fed040-0x77fff7fed050]
+0x77fff7fed050 [rwRW,0x77fff7fed040-0x77fff7fed050]
 
 Requested range was 0x77fff7fed050-0x77fff7fed051
 
 Tag address was at 0x7f7ff77ee7e5
 
 Shadow memory layout:
-  low   [0x77fff7ff0000-0x7f7ff77ef000]
-  gap   [0x7f7ff77ef000-0x7ffff77ef000]
-  high  [0x7ffff77ef000-0x7ffff7ff0000]
+low [0x77fff7ff0000-0x7f7ff77ef000]
+gap [0x7f7ff77ef000-0x7ffff77ef000]
+high [0x7ffff77ef000-0x7ffff7ff0000]
 
-tid: 15901
-================================================================
+# tid: 15901
 
 Program received signal SIGSEGV, Segmentation fault.
-{{blue_c}}0x000000000023309a in {{yellow_c}}morello::shim::svc_impl () at src/svc.cpp:54
-54      src/svc.cpp: No such file or directory.
+0x000000000023309a in morello::shim::svc_impl () at src/svc.cpp:54
+54 src/svc.cpp: No such file or directory.
 (gdb) where -2
 #15 0x00000000002785ff in printf (fmt=&lt;optimised out&gt;) at src/stdio/printf.c:9
-#16 0x00000000002734c3 in {{yellow_c}}main () at after.c:43
+#16 0x00000000002734c3 in main () at after.c:43
 
 ```
 
@@ -254,38 +270,41 @@ In this case, we see that the program progressed further and now the capability 
 
 Finally, we have the source running successfully using CHERIseed and we can say the program is now more CHERI-ready, i.e., that the source can be built and run on CHERI hardware. CHERIseed made it easy for us interpret the bug by giving elaborate details of the which operation failed and which capability was to be corrected etc.
 
-The [fix] [https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/146adba8e351c47069763286dd2d99e3931b64b6.diff]:
+<span>The</span> <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/146adba8e351c47069763286dd2d99e3931b64b6.diff">
+  fix
+</a> <span>:</span>
 
 <FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/4ce0ecbfdb129a37e3d26aa7cfed966bcc7f47e1.diff" />
 
 <CodeLayout>
   <div class="card-header">Using CHERI-related headers</div>
-  Let’s say we need the data of the string to be unmodifiable after we initialize
-  them. CHERI compiler builtins are provided for accessing/modifying capability properties
-  of pointers. For our use case, we can remove store permissions of the capability
-  using cheri_perms_and() API.
-  <FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_cheri_header.c" />
-  There are a set of builtin functions which provides access to capability properties.{" "}
-  <a href="https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/lib/Headers/cheriintrin.h">
-    cheriintrin.h{" "}
-  </a>
-  provides interface to access and modify those properties including few
-  capability permission constants. To learn more about this, see Sections 7 of
-  the
-  <a href="https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf">
-    CHERI C/C++ Programming Guide.
-  </a>
-  The compiler emits few warnings about the uses of improper casts which can be
-  resolved easily.
+  <div class="p-6">
+    Let’s say we need the data of the string to be unmodifiable after we
+    initialize them. CHERI compiler builtins are provided for
+    accessing/modifying capability properties of pointers. For our use case, we
+    can remove store permissions of the capability using cheri_perms_and() API.
+    <FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/40cc6e0565c4e210102516058f46f824db164752/cheriseed/001-blogpost/snippet_cheri_header.c" />
+    There are a set of builtin functions which provides access to capability
+    properties.{" "}
+    <a href="https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/lib/Headers/cheriintrin.h">
+      cheriintrin.h{" "}
+    </a>
+    provides interface to access and modify those properties including few capability
+    permission constants. To learn more about this, see Sections 7 of the
+    <a href="https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf">
+      CHERI C/C++ Programming Guide.
+    </a>
+    The compiler emits few warnings about the uses of improper casts which can be
+    resolved easily.
+  </div>
 </CodeLayout>
 
 # Other Examples
 
-<p>
-  1.{" "}
-  <a data-toggle="modal" data-target="#exampleModal">
-    Fiestel cipher example
-  </a>
+<p class="flex flex-row">
+
+  <ExampleModel />
+ 
 </p>
 
 # Limitations

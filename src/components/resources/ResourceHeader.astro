@@ -2,8 +2,6 @@
 import { Image } from "astro:assets";
 import logo from "../../assets/images/content/arm-logo.jpg";
 import dayjs from "dayjs";
-import { getEntry } from "astro:content";
-import { getEntries } from "astro:content";
 
 const { data } = Astro.props;
 
@@ -11,7 +9,7 @@ const dateObj = dayjs(data.date);
 const dateString = dateObj.format("dddd, MMMM D, YYYY");
 
 const readTime = `${Math.ceil(
-  data.data.description.split(" ").length / 183
+  data.data.description?.split(" ").length / 183
 )} min read`;
 ---
 
@@ -21,11 +19,12 @@ const readTime = `${Math.ceil(
       <div
         class="flex md:flex-row flex-col max-w-[1800px] items-center mx-auto md:mx-0"
       >
-        <div class="w-48 overflow-clip rounded-full ">
-          <Image class="object-cover"  src={logo} alt="logo" />
+        <div
+          class="overflow-clip rounded-full bg-white image-hover-effect w-[100px] h-[100px]"
+        >
+          <Image class="object-cover w-full mt-6" src={logo} alt="logo" />
         </div>
         <div class="flex flex-col ml-4 text-md">
-          <!-- Added ml-4 for spacing -->
           <div>
             <div class="mx-2 p-3">
               <strong class="pr-4">{data.data.author}</strong> |

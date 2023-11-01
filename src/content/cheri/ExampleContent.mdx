@@ -1,0 +1,165 @@
+import FetchData from "../../components/resources/CheriseedPortEffortlesslyToCheri/ExternalData/FetchData.astro";
+
+<div id='exampleModal'>
+<p>This page explores the use of CHERIseed with an example implementation for<a href="https://en.wikipedia.org/wiki/Feistel_cipher">
+    Feistel cipher algorithm</a>.</p>
+<p>Source –<a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/8b42372dc9b0eeda33ca484cc02d93067d09363d/cheriseed/001-blogpost/feistel/feistel.c">feistel.c</a></p>
+
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/raw/8b42372dc9b0eeda33ca484cc02d93067d09363d/cheriseed/001-blogpost/feistel/feistel.c" />
+
+<p>Compile feistel.c on the host machine using the following command.</p>
+
+```
+$> ${CC} \
+  --target=${TARGET_TRIPLE} \
+  -rtlib=compiler-rt \
+  --sysroot="${MUSL_PREFIX}" \
+  -lc -lpthread -lm -lrt \
+  -fuse-ld=lld \
+  -fsanitize=cheriseed \
+  -mabi=purecap \
+  -static \
+  -o feistel.o feistel.c
+```
+
+<p>Now run the program and use gdb to inspect the issue.</p>
+
+```(gdb) r
+Starting program: /home/cheriseed-example/feistel.o
+
+================================================================
+Runtime Error detected by CHERIseed
+
+Capability is untagged at 0xeffff7feacb0:
+
+  0xfffff7ff0040 [0x000000000000-0xffffffffffffffff] (invalid)
+
+Tag address was at 0xfefff77eeacb
+
+Shadow memory layout:
+  low   [0xeffff7ff0000-0xfefff77ef000]
+  gap   [0xfefff77ef000-0xfffff77ef000]
+  high  [0xfffff77ef000-0xfffff7ff0000]
+
+tid: 430628
+================================================================
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000000000232c1a in morello::shim::svc_impl () at src/svc.cpp:54
+54      src/svc.cpp: No such file or directory.
+(gdb) where
+#0  0x0000000000232c1a in morello::shim::svc_impl () at src/svc.cpp:54
+#1  0x0000000000232b9a in morello::shim::svc (arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=..., nr=<optimised out>, cg=...) at src/svc.cpp:183
+#2  0x00000000002387b8 in morello::shim::syscall (arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=..., nr=<optimised out>, cg=...) at build/gen/src/syscall.cpp:370
+#3  0x000000000023b66f in __shim_syscall (cg=..., nr=<optimised out>, arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=...) at build/gen/src/syscall.cpp:1031
+#4  0x000000000022c389 in Call () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_libc.cpp:139
+#5  0x000000000022bcde in Raise () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_libc.cpp:399
+#6  0x000000000022ad38 in RaiseSignal () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_errors.cpp:380
+#7  0x0000000000228d71 in RaiseSignal<__cheriseed::error::NotTaggedError, __cheriseed::LocalCap const&> () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_errors.h:309
+#8  0x000000000022662c in NotTaggedViolation () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed.cpp:57
+#9  RequireTagged () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed_local_cap.h:105
+#10 __cheriseed_check_access () at /llvm-project/compiler-rt/lib/cheriseed/cheriseed.cpp:698
+#11 0x000000000022f4dc in memcpy (dest=<optimised out>, src=<optimised out>, n=<optimised out>) at src/string/memcpy.c:39
+#12 0x0000000000273284 in feistel () at before.c:62
+#13 0x0000000000274c55 in run_feistel () at before.c:121
+#14 0x000000000027433f in TEST () at before.c:129
+#15 0x00000000002740d4 in main () at before.c:83
+(gdb) break feistel
+Breakpoint 1 at 0x26f6cc: file feistel.c, line 62.
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /home/cheriseed-workspace/feistel.o
+
+Breakpoint 1, feistel () at feistel.c:62
+43          if (iteration == -1) return (void *)b->data.addr;
+(gdb) n 5
+62      in before.c
+(gdb) break memcpy
+Breakpoint 2 at 0x23887c: file src/string/memcpy.c, line 14.
+(gdb) c
+Continuing.
+
+Breakpoint 2, memcpy (dest=<optimized out>, src=<optimized out>, n=<optimized out>) at src/string/memcpy.c:14
+14      src/string/memcpy.c: No such file or directory.
+(gdb) info registers x1 x2 x3
+x1             0xeffff7feb4b0      263882656363696
+x2             0xeffff7feb4a0      263882656363680
+x3             0x4                 4
+(gdb) x/2xg 0xeffff7feb4b0
+0xeffff7feb4b0: 0x0000fffff7ff0060      0x0000000000000000
+(gdb) x/2xg 0xeffff7feb4a0
+0xeffff7feb4a0: 0x0000fffff7ff0040      0x0000000000000000
+(gdb) x/s 0x0000fffff7ff0040
+0xfffff7ff0040: "THIS"
+```
+
+<p>
+  Inspecting the CHERIseed error message we can identify the type of violation.
+  In our case, frame 11 is the one in concern and resulted in untagged
+  capability violation because Data.addr is of the size_t type which cannot
+  represent a capability. To read more about these CHERI violations see section
+  6.1 of
+</p> <a href="https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf">
+  CHERI C/C++ Programming Guide
+</a> <span>
+  . Changing from all size_t to uintptr_t at Line 15 solves this issue.
+</span>
+
+<p>
+  Similarly, function prototypes of xor and round_function take capability
+  arguments but is casted to long which can be modified to uintptr_t.
+</p>
+
+<p>Running the program again gives the following output.</p>
+
+```
+(gdb) r
+Starting program: /home/cheriseed-example/feistel.o
+
+================================================================
+Runtime Error detected by CHERIseed
+
+Prevented out-of-bounds access with capability at 0xeffff7feb650:
+
+0xfffff7ff00a4 [rwRW,0xfffff7ff00a0-0xfffff7ff00a4]
+
+Requested range was 0xfffff7ff00a4-0xfffff7ff00a5
+
+Tag address was at 0xfefff77eeb65
+
+Shadow memory layout:
+low [0xeffff7ff0000-0xfefff77ef000]
+gap [0xfefff77ef000-0xfffff77ef000]
+high [0xfffff77ef000-0xfffff7ff0000]
+
+# tid: 459349
+
+================================================================
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000000000232c1a in morello::shim::svc_impl () at src/svc.cpp:54
+54 in src/svc.cpp
+(gdb) where -4
+#11 0x0000000000263401 in strlen (s=<optimised out>) at src/string/strlen.c:28
+#12 0x00000000002745b0 in run_feistel () at before.c:107
+#13 0x00000000002741fb in TEST () at before.c:130
+#14 0x0000000000273f24 in main () at before.c:83
+
+```
+
+<p>
+  In this case, we see that the capability referencing the text_ptr has length
+  0x04 but the strlen() is accessing the additional memory for the delimiter.
+  Having a close look at the trace we find that we are getting out-of-bounds
+  error while passing encoded_text to the run_feistel() at Line 130. Hence,
+  CHERIseed helped to find an out of bounds access in the source and we can
+  allocate an extra character to store null terminator.
+</p>
+<span>The fix </span> <a href="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/commitad587e4043dfa30962082d1c8be9eeea9e5fc791.diff">patch</a>
+
+<FetchData data="https://git.morello-project.org/morello/android/vendor/arm/morello-examples/-/commit/ad587e4043dfa30962082d1c8be9eeea9e5fc791.diff" />
+
+<p>The source can now be build and run on CHERI-hardware.</p>
+
+</div>

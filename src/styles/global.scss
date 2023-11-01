@@ -72,3 +72,23 @@ html {
     width: 240px !important;
   }
 }
+.card-header {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 0.75rem 1.25rem;
+}
+
+.image-hover-effect:hover {
+  transform: rotate(-15deg);
+  box-shadow: 10px 10px 10px rgba(0.2, 0.2, 0.2, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.posts {
+  color: black !important;
+}
+.posts:hover {
+  color: linkcolor !important;
+}
+.whiteColor {
+  color: white !important;
+}

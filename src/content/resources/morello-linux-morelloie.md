@@ -76,8 +76,6 @@ int main(int argc, char *argv[])
 }
 ```
 
-{: .language-cpp}
-
 Compile and link it using Morello Clang and Musl C library:
 
 ```
@@ -151,8 +149,6 @@ int main(int argc, char *argv[])
     return fun((__cheri_tocap int* __capability)data, 3);
 }
 ```
-
-{: .language-cpp}
 
 Here we have a pointer `data` to an array of three `int` values. We pass it to the function `fun` along with a number (index) of an element that we want to get. Naturally, when this program is executed, it will result in an out of bounds access which may or may not lead to a segmentation fault. In fact, it most likely will not (if we build and run it as a native AArch64 application).
 
@@ -292,8 +288,6 @@ char *ptr = malloc(64);
 char *ro_ptr = cheri_perms_and(ptr, LOAD | LOAD_CAP | MUTABLE_LOAD);
 ```
 
-{: .language-cpp}
-
 Note that our compiler will provide macros for the permission bits but for brevity we shortened their names. The macros for these shorter names may be defined like this:
 
 ```
@@ -318,8 +312,6 @@ Note that our compiler will provide macros for the permission bits but for brevi
 #define EXEC_CAP_PERMS EXECUTE | SYSTEM | EXECUTIVE
 ```
 
-{: .language-cpp}
-
 We'll be using this header in some of the examples below. Notice that some of the permission defines have prefix `__CHERI` and others have `__ARM`: the latter is for permissions that exist in Morello but don't exist in CHERI.
 
 You can always rely on your programming language features to enforce read-only behaviour, but Morello permissions work regardless of the language you use, and you don't even have to know how this other component is implemented.
@@ -333,8 +325,6 @@ str[0] = 'a';
 printf("str: %s ro: %s\n", str, ro_str);
 ro_str[0] = 'b';
 ```
-
-{: .language-cpp}
 
 If we build and run it, we'll see that it prints
 
@@ -405,8 +395,6 @@ int main(int argc, char *argv[])
     printf("%#p\n", cap);
 }
 ```
-
-{: .language-cpp}
 
 What we do here is take some function's address and print it using extended format specifier which on Morello will print not only pointer's value, but also some extra information:
 
@@ -492,8 +480,6 @@ int main(int argc, char *argv[])
 }
 ```
 
-{: .language-cpp}
-
 Build and run this app (notice that we use -O3 to make the assembly simpler):
 
 ```
@@ -559,8 +545,6 @@ int main(int argc, char *argv[])
 }
 ```
 
-{: .language-cpp}
-
 Build it in the same way as the previous example and run it:
 
 ```
@@ -576,8 +560,6 @@ foo.y = 13;
 foo.data[-4] = 42;
 printf("y = %d\n", foo.y); // that's still 13, right?
 ```
-
-{: .language-cpp}
 
 and get this:
 
@@ -749,8 +731,6 @@ int main(int argc, char *argv[])
 }
 ```
 
-{: .language-cpp}
-
 The protection properties and mapping flags supplied as `mmap` arguments will determine permissions that the resulting capability will hold. The `PROT_READ` protection will result in ability to do load operations via the capability returned by `mmap`, `PROT_WRITE` means that we'll be able to do store operations, and `PROT_EXEC` means we will be able to construct function pointers or branch targets from the capability obtained via `mmap`.
 
 When working with system calls on Morello, you may see some errors that you wouldn't normally expect. This is because a PCuABI kernel is stricter about some of the system calls and may generate new types of errors. When using Morello IE, do try the `-strace` emulator option to get detailed information about system calls:
@@ -793,8 +773,6 @@ int main(int argc, char *argv[])
 }
 ```
 
-{: .language-cpp}
-
 After building and running it, you should see something like this:
 
 ```
@@ -812,15 +790,11 @@ In this example, after updating the contents of the memory mapping, we can do th
 mprotect(cap, 1024, PROT_READ | PROT_EXEC);
 ```
 
-{: .language-cpp}
-
 and then derive a function pointer from the `cap_rx` capability. We shouldn't forget to seal it of course:
 
 ```
 my_fun_t fun = cheri_sentry_create(cap_rx);
 ```
-
-{: .language-cpp}
 
 You probably noticed the use of the `cheri_` functions that are defined in the `cheriintrin.h` header file provided by the compiler. You can find an outline of such functions in the last section below.
 
@@ -847,8 +821,6 @@ void *__builtin_cheri_program_counter_get();
 // Note: not available in Morello GCC
 void *__builtin_cheri_stack_get();
 ```
-
-{: .language-cpp}
 
 #### Get information about a capability
 
@@ -893,15 +865,11 @@ bool __builtin_cheri_sealed_get(const void *cap);
 size_t __builtin_cheri_copy_from_high(const void *cap);
 ```
 
-{: .language-cpp}
-
 There is no builtin for getting capability limit. You can use a combination of
 
 ```
 size_t limit = cheri_base_get(cap) + cheri_length_get(cap);
 ```
-
-{: .language-cpp}
 
 to achieve this.
 
@@ -951,8 +919,6 @@ void *__builtin_cheri_perms_and(const void *cap, size_t perms);
 void *__builtin_cheri_cap_from_pointer(const void *cap, size_t address);
 ```
 
-{: .language-cpp}
-
 One notable use case is worth looking at: create a capability with given length with some required offset (i.e., given bounds) from a source capability that potentially has larger bounds. Consider the following example:
 
 ```
@@ -968,8 +934,6 @@ int main() {
     return 0;
 }
 ```
-
-{: .language-cpp}
 
 Here we derive a capability from `CSP` and set its base to `csp.address - 64` and its length is 64 bytes while its offset is 16 bytes (with respect to the base value).
 
@@ -1000,8 +964,6 @@ void *__builtin_cheri_unseal(const void *cap, const void *sealer);
 void *__builtin_cheri_cap_type_copy(const void *cap, const void *otype);
 ```
 
-{: .language-cpp}
-
 Note: there is no builtin for LPB and LB object types, you will need to use inline assembly for this:
 
 ```
@@ -1022,8 +984,6 @@ void *__morello_seal_lb(void *cap)
 }
 ```
 
-{: .language-cpp}
-
 #### Compare capabilities
 
 ```
@@ -1037,8 +997,6 @@ bool __builtin_cheri_equal_exact(const void *lhs, const void *rhs)
 bool __builtin_cheri_subset_test(const void *subcap, const void *cap);
 ```
 
-{: .language-cpp}
-
 #### Operations for bounds representability
 
 ```
@@ -1050,8 +1008,6 @@ size_t __builtin_cheri_round_representable_length(size_t length);
 // Use as "cheri_representable_alignment_mask" declared in cheriintrin.h
 size_t __builtin_cheri_representable_alignment_mask(size_t length);
 ```
-
-{: .language-cpp}
 
 #### Miscellaneous
 
@@ -1068,8 +1024,6 @@ size_t __builtin_cheri_cap_load_tags(const void *cap);
 // Use as "cheri_cap_build" declared in cheriintrin.h
 void *__builtin_cheri_cap_build(const void *key, unsigned __intcap bits);
 ```
-
-{: .language-cpp}
 
 ---
 

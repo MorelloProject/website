@@ -5,21 +5,13 @@ description: >-
 slug: /contact/
 layout: "../../layouts/Flow.astro"
 hero:
-  title: Contact Us
+  dark_title: Contact Us
   description: >
     To find out more about the Morello Project, please get in touch!
+  style: h-[350px]
+  background_image: ../../assets/images/content/bg_light.png
   buttons:
     title: Send Email
     url: "mailto:enquiries@morello-project.org"
-    style: btn-primary
-# flow:
-#   - row: container_row
-#     sections:
-#         - format: title
-#           title_content:
-#             text: Contact Us
-#             size: h3
-#         - format: buttons
-#           style: #
-#           buttons_content:
+    style: btn-primary whiteColor
 ---

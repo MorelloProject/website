@@ -1,42 +1,31 @@
 ---
 import * as marked from "marked";
 
-const { first_section, second_section } = Astro.props!;
-const markdown_first = marked.parse(first_section.text);
-const markdown_second = marked.parse(second_section.text);
+const { card_section } = Astro.props!;
+
+const markdown_text = (text: any) => {
+  return marked.parse(text);
+};
 ---
 
-<div
-  class="flex flex-col md:flex-row w-[80%] items-center justify-center back_color"
->
-  <div class="mr-4 mb-4 md:mb-0 relative flex-1 mt-10">
-    <div
-      class="relative overflow-hidden bg-cover bg-no-repeat"
-      style={{ height: "300px" }}
-    >
-      <img
-        class="rounded border-x-4 border-white border-t-4 w-full h-[250px] object-cover"
-        src={first_section.image.src}
-        alt={first_section.image.alt}
-      />
-    </div>
-    <div class="p-6 max-w-max text-center">
-      <p class="text-base text-dark !important" set:html={markdown_first} />
-    </div>
-  </div>
-  <div class="relative flex-1">
-    <div
-      class="relative overflow-hidden bg-cover bg-no-repeat"
-      style={{ height: "300px" }}
-    >
-      <img
-        class="rounded h-[250px] border-x-4 border-white border-t-4 w-full object-cover"
-        src={second_section.image.src}
-        alt={second_section.image.alt}
-      />
-    </div>
-    <div class="p-6 max-w-max text-center">
-      <p class="text-base text-dark" set:html={markdown_second} />
-    </div>
-  </div>
+<div class="grid grid-cols-1 grid-rows-1 md:grid-cols-2 p-2 md:p-0">
+  {
+    card_section.map((card: any) => (
+      <div class="md:mr-4 block lg:max-w-[600px] ">
+        <div class=" ">
+          <img
+            class="rounded border-x-[6px] border-white border-t-[6px] w-full h-[250px] object-cover"
+            src={card.image.src}
+            alt={card.image_alt}
+          />
+        </div>
+        <div class="max-w-max text-center">
+          <p
+            class="text-base text-dark !important"
+            set:html={markdown_text(card.text)}
+          />
+        </div>
+      </div>
+    ))
+  }
 </div>

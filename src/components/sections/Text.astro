@@ -4,6 +4,6 @@ import * as marked from "marked";
 const markdown = marked.parse(text_content.text);
 ---
 
-<div class:list={[style, " px-2"]}>
+<div class:list={[style, "container mx-auto mt-10 px-4"]}>
   <p set:html={markdown} />
 </div>

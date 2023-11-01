@@ -9,18 +9,18 @@ hero:
   style: flex-column expandable_jumbotron background-image morello
   # include: morello_homepage_header_section.html
   background_image: ../../assets/images/content/iStock-1147065676.jpg
-  first_section:
-    image: ../../assets/images/content/iStock-1195413927.jpg
-    image_alt: test image alt
-    text: |-
-      Morello is a research program led by Arm in association with partners and funded by the UKRI as
-      part of the UK government [Digital Security by Design (DSbD) programme](https://www.ukri.org/innovation/industrial-strategy-challenge-fund/digital-security-by-design/) . It defines a new prototype security architecture based on CHERI (Capability Hardware Enhanced RISC Instructions).
-  second_section:
-    image: ../../assets/images/content/DSCF0218.jpg
-    image_alt: second test image alt
-    text: |-
-      A DSbD technology platform prototype (the Morello board) provides a SoC implementation of the architecture. 
-      This was created to enable software developers and researchers to explore real-world use cases and inform future development.
+  card_section:
+    - image: ../../assets/images/content/iStock-1195413927.jpg
+      image_alt: test image alt
+      text: |-
+        Morello is a research program led by Arm in association with partners and funded by the UKRI as
+        part of the UK government [Digital Security by Design (DSbD) programme](https://www.ukri.org/innovation/industrial-strategy-challenge-fund/digital-security-by-design/). It defines a new prototype security architecture based on CHERI (Capability Hardware Enhanced RISC Instructions).
+    - image: ../../assets/images/content/DSCF0218.jpg
+      image_alt: second test image alt
+      text: |-
+        A DSbD technology platform prototype (the Morello board) provides a SoC implementation of the architecture. 
+        This was created to enable software developers and researchers to explore real-world use cases and inform future development.
+
 dev_section:
   [
     {
@@ -53,7 +53,7 @@ flow:
             ## Introduction
             This website is the home page for research on Capability aware Morello Linux environments. To learn more please refer to our [Morello Linux documentation](https://linux.morello-project.org/docs/).
 
-            The Morello platform is supported by a number of evolving RTOS/OS environments at different stages of maturity. [CheriBSD](https://www.cheribsd.org/) is implemented and hosted separately by the University of Cambridge and SRI International and includes a memory-safe kernel, userspace and various example frameworks. The [CHERI OS-feature matrix]( https://www.morello-project.org/cheri-feature-matrix/) includes more information on features implemented by Morello Linux and CheriBSD operating systems.
+            The Morello platform is supported by a number of evolving RTOS/OS environments at different stages of maturity. [CheriBSD](https://www.cheribsd.org/) is implemented and hosted separately by the University of Cambridge and SRI International and includes a memory-safe kernel, userspace and various example frameworks. The [CHERI OS-feature matrix]( /cheri-feature-matrix/) includes more information on features implemented by Morello Linux and CheriBSD operating systems.
 
       - component: text
         style: bg-white p-2 my-3

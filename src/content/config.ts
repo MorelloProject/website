@@ -1,15 +1,18 @@
 import { z, defineCollection, reference } from "astro:content";
+import { docsSchema } from "@astrojs/starlight/schema";
 
 const pages = defineCollection({
   type: "content",
   schema: ({ image }) =>
     z.object({
-      title: z.string(),
+      title: z.string().optional(),
+      dark_title: z.string().optional(),
       description: z.string().optional(),
       image: image().optional(),
       hero: z
         .object({
-          title: z.string(),
+          dark_title: z.string().optional(),
+          title: z.string().optional(),
           description: z.string().optional(),
           background_image: image().optional(),
           style: z.string().optional(),
@@ -20,12 +23,14 @@ const pages = defineCollection({
               style: z.string(),
             })
             .optional(),
-          first_section: z
-            .object({
-              image: image(),
-              image_alt: z.string(),
-              text: z.string(),
-            })
+          card_section: z
+            .array(
+              z.object({
+                image: image(),
+                image_alt: z.string(),
+                text: z.string(),
+              })
+            )
             .optional(),
           second_section: z
             .object({
@@ -114,6 +119,8 @@ const data = defineCollection({
   schema: z.any(),
 });
 
+const docs = defineCollection({ schema: docsSchema() });
+
 // Expose your defined collection to Astro
 // with the `collections` export
 export const collections = {
@@ -123,4 +130,5 @@ export const collections = {
   data,
   resources,
   cheri,
+  docs,
 };

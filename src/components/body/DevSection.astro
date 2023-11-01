@@ -1,7 +1,5 @@
 ---
-import { Image } from "astro:assets";
 const { dev_section } = Astro.props!;
-console.log(dev_section);
 ---
 
 <div
@@ -10,7 +8,7 @@ console.log(dev_section);
   {
     dev_section.map((card: any) => (
       <div class=" rounded-lg ">
-        <div class="mx-auto mr-4 flex flex-col items-center justify-center w-[80%] text-center">
+        <div class="mx-auto md:mr-4 flex flex-col items-center justify-center w-[80%] text-center">
           <img class="w-[120px]" alt="icon" src={card.image.src} />
           <a href={card.url} class="hover:underline">
             <h3 class="mb-2 font-bold text-3xl  leading-tight text-blue">

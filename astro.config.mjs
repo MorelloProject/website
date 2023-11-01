@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
+import starlight from "@astrojs/starlight";
 import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 

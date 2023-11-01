@@ -1,12 +1,12 @@
 ---
-title: CHERI OS-feature matrix
+dark_title: CHERI OS-feature matrix
 description: >-
   To find out more about the Morello Project, please get in touch!
 slug: /cheri-feature-matrix/
 layout: "../../layouts/Flow.astro"
 hero:
   title: CHERI OS-feature matrix
-  background_image: ../../assets/images/content/iStock-1147065676.jpg
+
 flow:
   - row: container_row
     style: bg-light
