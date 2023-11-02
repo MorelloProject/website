@@ -6,7 +6,7 @@ slug: ""
 layout: ../../layouts/Flow.astro
 hero:
   title: Welcome to the landing page for Morello Linux
-  style: flex-column expandable_jumbotron background-image morello
+  style: flex-column expandable_jumbotron  morello bg-white
   # include: morello_homepage_header_section.html
   background_image: ../../assets/images/content/iStock-1147065676.jpg
   card_section:
