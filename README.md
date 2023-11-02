@@ -1,55 +1,82 @@
-# Morello Project Website
+# Morello Website
 
-This is the git repository for the Morello Project Website.
+This is the git repository for the Morello static website, built using [Astro](https://astro.build/).
 
-## 🚀 Project Structure
+## Project Structure
 
-Inside of your Astro project, you'll see the following folders and files:
+The content of the website is located in the `src/content` folder of the repo, spread across various folders, referred to as "collections".
 
 ```text
-/
-├── public/
+
 ├── src/
-│   └── pages/
-│       └── index.astro
-│       └── resources
-│   └──content/
-│       └──data/
-│       └──pages/
-│       └──rows/
-│       └──sections/
-└── package.json
+
+│   └── content/
+
+│       └── data/
+
+│       └── pages/
+
+│       └── rows/
+
+│       └── sections/
+
+```
+
+## Content
+
+### Pages
+
+Pages can be edited via the relevant `.md` files in the `src/content/pages` folder. The `slug` property of the frontmatter determines the resulting url of the page.
+
+New layouts can be built by adding rows and sections to the `flow` property of a page's frontmatter. This property defines a series of row components that contain section components that make up the page. The `row` property of `flow` and the `component` property of a `sections` item must both reference a filename (without extension) within the `row` and `section` collections respectively. These files in turn contain a path that points to the specified component.
+
+```yaml
+- flow:
+    - row: container_row
+      sections:
+        - component: text
+```
+
+`container_row` here references `src/content/rows/container_row.md` and `text` references `src/content/sections/text.md`
+
+If a new row or section component is required, please contact [it-support@linaro.org](mailto:it-support@linaro.org).
+
+To render the `.md` content of the page file, please use the `md_content` component as follows.
+
+```yaml
+- row: container_row
+    sections:
+      - component: md_content
 ```
 
 ### Data
 
-The `src/content/data` folder contains various lists of one-off items used in the site, namely the nav links, footer links and members. Any items added to these lists will be reflected in the website.
+The `src/content/data` folder contains various lists of one-off items used in the site, such as nav links and footer links. Any items added to these lists will be reflected in the website.
 
-### Pages
+## Assets
 
-Pages can be edited via the relevant `.md or mdx` files in the `src/content/pages` folder. New pages containing the nav, header, footer and a body of rendered markdown content can be implemented by adding `.md || .mdx` files to this folder (as with the cookies, conduct and governance pages). If rendered markdown content is not sufficient, please contact [it-support@linaro.org](mailto:it-support@linaro.org) to discuss implementing a new page.
+### Images
 
-### Rows
+Images should be placed in the `src/assets` folder and referenced by relative file paths within content collection `.md` files. e.g. `../../assets/images/test_image.jpeg`. This ensures that the images are optimized at build time, improving website performance.
 
-The Src /content /rows folder contains a container for content of all of the pages row.
+### Docs
 
-### Sections
+Documents should be placed in the `public/docs` folder and referenced by relative url paths within content collection `.md` files e.g. `/docs/test_file.pdf`. This ensures that the documents are hosted on publicly accessible urls.
 
-The Src /content /sections folder containes various list of items in section part of each page.
+## Developer Info
 
-## 🧞 Commands
+Running the site locally will require `Node.js` (>=18) and the `yarn` package manager.
 
-All commands are run from the root of the project, from a terminal:
+First, install dependencies with `yarn install`.
 
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `yarn install`         | Installs dependencies                            |
-| `yarn dev`             | Starts local dev server at `localhost:4321`      |
-| `yarn build`           | Build your production site to `./dist/`          |
-| `yarn preview`         | Preview your build locally, before deploying     |
-| `yarn astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `yarn astro -- --help` | Get help using the Astro CLI                     |
+The following commands can then be used to build and run the site locally:
 
-## 👀 Want to learn more?
+| Command        | Description                                                                                                                                                                             |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `yarn build`   | Builds the site in the `dist` folder of the root directory.                                                                                                                             |
+| `yarn dev`     | Runs the site in a development server, with hot module replacement to reflect updates to the code as soon as they are saved.                                                            |
+| `yarn preview` | Runs the most recent build files in a development server. Unlike `yarn dev` this won't have live updates, but will be a closer representation of the site as it would be in deployment. |
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Questions?
+
+If you have any questions about updating or building this website, please contact Linaro IT Support at [it-support@linaro.org](mailto:it-support@linaro.org).
