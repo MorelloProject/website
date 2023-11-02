@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import logo from "../../assets/images/content/arm-logo.jpg";
+import linaro_logo from "../../assets/images/linaro-logo.png";
 import dayjs from "dayjs";
 
 const { data } = Astro.props;
@@ -8,9 +9,7 @@ const { data } = Astro.props;
 const dateObj = dayjs(data.date);
 const dateString = dateObj.format("dddd, MMMM D, YYYY");
 
-const readTime = `${Math.ceil(
-  data.data.description?.split(" ").length / 183
-)} min read`;
+const readTime = `${Math.ceil(data.body?.split(" ").length / 183)} min read`;
 ---
 
 <div class="bg-[#f8f9fa]">
@@ -22,7 +21,17 @@ const readTime = `${Math.ceil(
         <div
           class="overflow-clip rounded-full bg-white image-hover-effect w-[100px] h-[100px]"
         >
-          <Image class="object-cover w-full mt-6" src={logo} alt="logo" />
+          {
+            data.data.author == "linaro" ? (
+              <Image
+                class="object-cover w-full mt-6"
+                src={linaro_logo}
+                alt="logo"
+              />
+            ) : (
+              <Image class="object-cover w-full mt-6" src={logo} alt="logo" />
+            )
+          }
         </div>
         <div class="flex flex-col ml-4 text-md">
           <div>

@@ -31,7 +31,7 @@ function contentConvertor(text: string) {
     RecentPosts.map((blog: any) => (
       <a
         href={`/resources/${contentConvertor(blog.slug)}`}
-        class="no-underline cursor-pointer text-[20px]  posts posts:hover "
+        class="no-underline cursor-pointer text-[20px]    "
       >
         <div class="flex flex-col md:flex-row items-start gap-10 mt-8">
           <Image
@@ -55,7 +55,7 @@ function contentConvertor(text: string) {
     OtherPosts.map((blog: any) => (
       <a
         href={`/resources/${contentConvertor(blog.slug)}`}
-        class="text-black no-underline cursor-pointer text-[20px] posts:hover posts "
+        class="text-black no-underline cursor-pointer text-[20px]  "
       >
         <div class="flex flex-col md:flex-row items-start gap-10 mt-8">
           <Image

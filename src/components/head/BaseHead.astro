@@ -4,16 +4,17 @@ import GoogleAnalytics from "./GoogleAnalytics.astro";
 import { SEO } from "astro-seo";
 import "@fontsource/lato";
 import "../../styles/global.scss";
-// const { GA_ID } = import.meta.env;
+const GA_ID = import.meta.env.GA_ID;
 
 const {
-  title = "The OpenAMP Project",
-  description = "OpenAMP (Open Asymmetric Multi-Processing) seeks to standardize the interactions between operating environments in a heterogeneous embedded system through open source solutions for Asymmetric MultiProcessing (AMP).",
+  title = "The Morello Project",
+  description = "The Morello platform is supported by a number of evolving RTOS/OS environments at different stages of maturity. CheriBSD is implemented and hosted separately by the University of Cambridge and SRI International and includes a memory-safe kernel, userspace and various example frameworks. The CHERI OS-feature matrix includes more information on features implemented by Morello Linux and CheriBSD operating systems.",
   type = "website",
 } = Astro.props;
 ---
 
 <head>
+  <link rel="icon" href="/favicon.png" type="image/x-icon" />
   <title>{title}</title>
   <meta property="description" content={description} />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,7 +26,7 @@ const {
   <link href="https://{{cdn}}/prismjs@v1.x/themes/prism.css" rel="stylesheet" />
 
   <Cookies />
-  <!-- <GoogleAnalytics id={GA_ID} /> -->
+  <GoogleAnalytics id={GA_ID} />
   <SEO
     title={title}
     description={description}

@@ -1,0 +1,25 @@
+---
+
+---
+
+<script type="text/javascript" defer nomodule>
+window.onload = function () {
+  document.getElementById("capinfo").innerHTML =
+    '<span style="text-align: center">Capinfo requires a browser with support for ES Modules and WebAssembly support.</span>';
+};
+</script>
+<script type="module">
+  import init, {
+    version,
+    capinfo_version,
+    append_capinfo_to,
+  } from "../../assets/capinfo/capinfo_web.js";
+  async function run() {
+    await init();
+    console.log("capinfo_web " + version() + ".");
+    console.log("capinfo " + capinfo_version() + ".");
+    const ccc = document.getElementById("capinfo");
+    ccc && append_capinfo_to(ccc, "capinfo.svg");
+  }
+  run();
+</script>

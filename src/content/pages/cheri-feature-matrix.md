@@ -10,8 +10,6 @@ hero:
 flow:
   - row: container_row
     style: bg-light
-    sections:
-      - component: custom_include
   - row: container_row
     style: bg-light morello-content
     sections:
@@ -54,7 +52,7 @@ flow:
             focus of Morello Linux is the implementation of a new pure capability kernel-user ABI, supported by development in C libraries(initially musl libc) and tooling (Morello LLVM). Associated community driven work on a Yocto framework for evolving userspace ports is also underway. The current status of the project is focused on building the environment and is actively seeking contributions to help enable and accelerate the work. Future integration releases aim to expand the scope of the existing implementation and introduce GNU/glibc tooling. For more details on status visit the [morello-project.org](https://www.morello-project.org/) homepage.
 
       - component: text
-        style: bg-white p-4 my-3
+        style: bg-white p-4 my-3 overflow-x-auto
         text_content:
           text: |-
             ## CHERI feature matrix

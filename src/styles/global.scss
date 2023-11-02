@@ -31,6 +31,12 @@ html {
     -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
   }
+  .text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .back_color {
     background-color: linear-gradient(
       to bottom,
@@ -48,7 +54,7 @@ html {
     @apply p-4  mx-auto;
   }
 }
-.prose a {
+.prose a:hover {
   @apply text-linkcolor;
   @apply no-underline;
 }
@@ -87,8 +93,30 @@ html {
   color: black !important;
 }
 .posts:hover {
-  color: linkcolor !important;
+  color: #ffa409;
 }
 .whiteColor {
   color: white !important;
+}
+
+div#capinfo {
+  margin: 0.5em;
+}
+div#capinfo svg {
+  display: block;
+  margin: 0px auto;
+}
+div#capinfo input {
+  box-shadow: rgb(235, 235, 235) 0px 0px 10px 5px;
+  display: block;
+  margin: 1em auto;
+  width: 28em;
+  text-align: center;
+  font-family: "DejaVu Sans Mono", monospace;
+  font-size: 16px;
+  border: 2px solid black;
+}
+div#capinfo input.error {
+  background-color: #ffdabf;
+  border-color: #ff6b00;
 }
