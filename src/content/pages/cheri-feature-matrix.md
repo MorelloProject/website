@@ -6,6 +6,9 @@ slug: /cheri-feature-matrix/
 layout: "../../layouts/Flow.astro"
 hero:
   title: CHERI OS-feature matrix
+  background_image: ../../assets/images/content/iStock-1147065676.jpg
+
+  # style: bg-[rgba(0, 0, 0, 0.7)] absolute w-full h-full
 
 flow:
   - row: container_row

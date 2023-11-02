@@ -32,9 +32,8 @@ const {
 <div class="h-full">
   <div
     class:list={[
-      style,
-      "hero-background",
-      "flex flex-col items-center  w-full h-[350px] py-4",
+      card_section ? "hero-background-home" : "hero-background",
+      "flex flex-col items-center  w-full h-[350px] py-4 ",
     ]}
   >
     <div class="container pt-10">
@@ -93,9 +92,37 @@ const {
     background-size: cover;
     background-repeat: no-repeat;
     height: max-content;
+    position: relative;
+    z-index: 1;
   }
 
   .hero-background::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 79%);
+    color: dark;
+
+    height: 350px;
+  }
+  .hero-background-home {
+    background-image: linear-gradient(
+        to bottom,
+        rgba(75, 85, 99, 0.62),
+        rgba(255, 255, 255, 1)
+      ),
+      var(--backgroundUrl);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: max-content;
+  }
+
+  .hero-background-home::before {
     content: "";
     position: absolute;
     top: 0;
