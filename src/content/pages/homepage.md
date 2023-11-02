@@ -64,7 +64,7 @@ flow:
 
             The Morello hardware development platform is now available to organizations involved in defined research activities. Access to the platform is managed by the UK government's Digital Security by Design (DSbD) [Technology Access Programme](https://www.dsbd.tech/technology-access-programme/).
 
-            ![alt text](../../src/assets/images/content/DSCF0211-Edit.jpg)
+            ![alt text](/assets/content/DSCF0211-Edit.jpg)
 
             To get started please refer to our [Morello User Guide](https://linux.morello-project.org/docs/user-guide/).
 
