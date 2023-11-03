@@ -54,7 +54,8 @@ const { resource } = Astro.props;
     src="./node_modules/@github/clipboard-copy-element/dist/index.js"></script>
   <script>
     let copyButtonLabel = "Copy Code";
-    let copyButtonImageSrc = "../../src/assets/images/clipboard-copy.svg";
+    let copyButtonImageSrc =
+      "../../../public/assets/content/clipboard-copy.svg";
     let codeBlocks = Array.from(document.querySelectorAll("pre"));
 
     for (let codeBlock of codeBlocks) {

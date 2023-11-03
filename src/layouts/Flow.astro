@@ -46,7 +46,7 @@ const { flow, hero, title,dark_title, description,dev_section } = page.data;
 ---
 
 <BaseLayout title={title} dark_title={dark_title} description={description}>
-  <main class="prose prose-xl w-full max-w-full md-content ">
+  <main class="prose prose-xl w-full max-w-full md-content  ">
     <MainHero {...hero} />
     {dev_section &&<Sections dev_section={dev_section} />}
      
@@ -103,8 +103,8 @@ const { flow, hero, title,dark_title, description,dev_section } = page.data;
     ul {
       list-style-type: disc;
       margin-bottom: 20px;
-      li {
-        font-size: x-large;
+      li ::marker{
+        // font-size: x-large;
         color: black;
       }
     }

@@ -3,10 +3,11 @@ layout: "../../layouts/Flow.astro"
 title: Cookies Policy
 description: |-
   Update and remove cookies from your browser set by our site.
-slug: /cookies/
+slug: /cookies
 hero:
   title: Cookies
   description: ""
+
 flow:
   - row: container_row
     sections:
