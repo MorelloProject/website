@@ -1,4 +1,6 @@
 ---
+import DropdownMenu from './DropdownMenu.astro';
+
 const titles: { title: string; url: string; children?: any }[] = [
   { title: "CHERI - Overview", url: "cheri---overview" },
   { title: "CHERIseed - Introduction", url: "cheriseed--introduction" },
@@ -23,9 +25,10 @@ const titles: { title: string; url: string; children?: any }[] = [
 ];
 ---
 
+<div class="hidden lg:flex">
 <nav
   id="sidenav-4"
-  class="group  fixed left-0 top-0 z-[1035] h-screen w-60 -translate-x-full overflow-hidden bg-white shadow-[0_4px_12px_0_rgba(0,0,0,0.07),_0_2px_4px_rgba(0,0,0,0.05)] data-[te-sidenav-slim='true']:hidden data-[te-sidenav-slim-collapsed='true']:w-[77px] data-[te-sidenav-slim='true']:w-[77px] data-[te-sidenav-hidden='false']:translate-x-0 dark:bg-zinc-800 [&[data-te-sidenav-slim-collapsed='true'][data-te-sidenav-slim='false']]:hidden [&[data-te-sidenav-slim-collapsed='true'][data-te-sidenav-slim='true']]:[display:unset]"
+  class="group fixed left-0 top-0 z-[1035] h-screen w-60 -translate-x-full overflow-hidden bg-white shadow-[0_4px_12px_0_rgba(0,0,0,0.07),_0_2px_4px_rgba(0,0,0,0.05)] data-[te-sidenav-slim='true']:hidden data-[te-sidenav-slim-collapsed='true']:w-[77px] data-[te-sidenav-slim='true']:w-[77px] data-[te-sidenav-hidden='false']:translate-x-0 dark:bg-zinc-800 [&[data-te-sidenav-slim-collapsed='true'][data-te-sidenav-slim='false']]:hidden [&[data-te-sidenav-slim-collapsed='true'][data-te-sidenav-slim='true']]:[display:unset]"
   data-te-sidenav-init
   data-te-sidenav-hidden="false"
   data-te-sidenav-mode="side"
@@ -78,6 +81,7 @@ const titles: { title: string; url: string; children?: any }[] = [
    
   </ul>
 </nav>
+</div>
 <!-- Sidenav -->
 
 <div id="slim-content" class="!pl-[77px] hidden ">
@@ -109,6 +113,9 @@ const titles: { title: string; url: string; children?: any }[] = [
     Toggle Slim
   </button>
   <!-- Toggler -->
+</div>
+<div class="lg:hidden w-full">
+  <DropdownMenu titles={titles} />
 </div>
 
 <script>
