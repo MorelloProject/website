@@ -4,7 +4,7 @@ import { marked } from "marked";
 ---
 
 <!--Tabs navigation-->
-<div class="prose-lg md:prose-xl px-4 lg:px-[190px]">
+<div class="container mx-auto px-4 lg:px-[190px] mt-10">
   <div
     class="mb-4 flex list-none flex-row flex-wrap border-b-0 pl-0"
     id="tabs-tab3"
@@ -13,10 +13,10 @@ import { marked } from "marked";
   >
     {
       tabs.map((tab: any, index: number) => (
-        <div role="presentation">
+        <div role="presentation" class="">
           <a
             href={`#tabs-${index + 1}`}
-            class="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+            class="posts my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-base  uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
             id={`tabs-tab-${index + 1}`}
             data-te-toggle="pill"
             data-te-target={`#tabs-${index + 1}`}
