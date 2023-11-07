@@ -1,0 +1,56 @@
+---
+const { titles } = Astro.props;
+---
+
+<div class="relative" data-te-dropdown-ref>
+  <button
+    class="inline-block w-full bg-[#e5e7eb] p-8 text-base font-medium uppercase leading-normal text-black shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+    type="button"
+    data-te-collapse-init
+    data-te-ripple-init
+    data-te-ripple-color="light"
+    data-te-target="#collapseExample"
+    aria-expanded="false"
+    aria-controls="collapseExample"
+  >
+    On This Page
+  </button>
+  <div
+    class="!visible hidden text-center"
+    id="collapseExample"
+    data-te-collapse-item
+  >
+    <ul class="list-none mx-auto">
+      {
+        titles.map((item: any) => (
+          <li class="list-none w-full rounded-lg bg-white-100 p-4 text-black font-medium">
+            <a class="posts" href={`#${item.url}`}>
+              {item.title}
+            </a>
+            {item.children && (
+              <ul>
+                {item.children.map((child: any) => (
+                  <li class="list-none ">
+                    <a class="posts" href={`#${child.url}`}>
+                      {child.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+<script>
+  import { Collapse, Ripple, initTE } from "tw-elements";
+
+  initTE({ Collapse, Ripple });
+
+  document.body.addEventListener("click", function (event) {
+    const dropdown = document.getElementById("collapseExample");
+    dropdown?.classList.add("hidden");
+  });
+</script>

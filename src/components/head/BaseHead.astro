@@ -11,6 +11,8 @@ const {
   description = "The Morello platform is supported by a number of evolving RTOS/OS environments at different stages of maturity. CheriBSD is implemented and hosted separately by the University of Cambridge and SRI International and includes a memory-safe kernel, userspace and various example frameworks. The CHERI OS-feature matrix includes more information on features implemented by Morello Linux and CheriBSD operating systems.",
   type = "website",
 } = Astro.props;
+
+const social_image = "../../assets/images/social-media-image.png";
 ---
 
 <head>
@@ -34,7 +36,7 @@ const {
       basic: {
         title: title,
         type: type,
-        image: "https://www.openampproject.org/images/social-media-image.png",
+        image: "../../assets/images/social-media-image.png",
       },
     }}
     twitter={{
@@ -51,8 +53,7 @@ const {
       meta: [
         {
           name: "twitter:image",
-          content:
-            "https://www.openampproject.org/images/openAMP_share_image.png",
+          content: { social_image },
         },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },

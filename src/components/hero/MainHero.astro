@@ -32,19 +32,18 @@ const {
 <div class="h-full">
   <div
     class:list={[
-      style,
-      "hero-background",
-      "flex flex-col items-center  w-full h-[350px] py-4",
+      card_section ? "hero-background-home" : "hero-background",
+      "flex flex-col items-center  w-full h-[350px] py-4 ",
     ]}
   >
-    <div class="container pt-10">
+    <div class="container pt-10 p-2">
       {
-        background_image && title ? (
-          <h1 class="container text-5xl p-10 mt-10 text-center font-light bg-white  text-dark border rounded ">
+        background_image && title && card_section ? (
+          <h1 class="container mx-auto  text-2xl md:text-4xl p-10 mt-10 text-center  text-dark bg-white rounded ">
             {title}
           </h1>
         ) : background_image && dark_title ? (
-          <h1 class="container text-5xl p-2 mt-10  font-light text-left text-dark  ">
+          <h1 class="container text-5xl p-2 mt-10  font-light text-left text-white  ">
             {dark_title}
           </h1>
         ) : (
@@ -54,7 +53,7 @@ const {
         )
       }
 
-      {description && <p>{description}</p>}
+      {description && <p class="text-white">{description}</p>}
 
       {
         buttons && (
@@ -92,10 +91,38 @@ const {
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    height: max-content;
+    height: 300px;
+    position: relative;
+    z-index: 1;
   }
 
   .hero-background::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 84%);
+    color: dark;
+
+    height: 350px;
+  }
+  .hero-background-home {
+    background-image: linear-gradient(
+        to bottom,
+        rgba(75, 85, 99, 0.62),
+        rgba(255, 255, 255, 1)
+      ),
+      var(--backgroundUrl);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: max-content;
+  }
+
+  .hero-background-home::before {
     content: "";
     position: absolute;
     top: 0;

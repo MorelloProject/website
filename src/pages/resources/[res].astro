@@ -33,7 +33,7 @@ const { Content } = await resource.render();
     description={resource.data.description}
   >
     <main class="prose prose-xl w-full max-w-full bg-white">
-      <div class="mx-auto py-4 md:max-w-[1200px] w-auto sm:p-2">
+      <div class="mx-auto p-6 mt-[22px] md:max-w-[1200px] w-full sm:p-2">
         <h1 class="text-[2em] font-medium">
           {resource.data.title}
         </h1>
@@ -71,8 +71,8 @@ const { Content } = await resource.render();
       ul {
         list-style-type: disc;
         margin-bottom: 20px;
-        li {
-          font-size: x-large;
+        li::marker {
+          // font-size: x-large;
           color: black;
         }
       }
@@ -173,7 +173,7 @@ const { Content } = await resource.render();
   </style>
   <script>
     let copyButtonLabel = "Copy Code";
-    let copyButtonImageSrc = "../../src/assets/images/clipboard-copy.svg";
+    let copyButtonImageSrc = "/assets/content/clipboard-copy.svg";
     let codeBlocks = Array.from(document.querySelectorAll("pre"));
 
     for (let codeBlock of codeBlocks) {

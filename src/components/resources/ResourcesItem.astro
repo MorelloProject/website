@@ -3,6 +3,7 @@ const { resource } = Astro.props;
 import dayjs from "dayjs";
 import { Image } from "astro:assets";
 import armLogo from "../../assets/images/content/arm-logo.jpg";
+import LinaroLogo from "../../assets/images/linaro-logo.png";
 
 const dateObj = dayjs(resource.data.date);
 const dateString = dateObj.format("dddd, MMMM D, YYYY");
@@ -23,7 +24,13 @@ const dateString = dateObj.format("dddd, MMMM D, YYYY");
     >
       <div class="flex flex-row justify-between">
         <p class="mt-8">{resource.data.author.toUpperCase()}</p>
-        <Image style="width:50px" alt="arm logo" src={armLogo} />
+        {
+          resource.data.author === "arm" ? (
+            <Image style="width:50px" alt="arm logo" src={armLogo} />
+          ) : (
+            <Image style="width:50px" alt="arm logo" src={LinaroLogo} />
+          )
+        }
       </div>
       <h3 class="font-normal">{resource.data.title}</h3>
       <p class="text-[#6c757d] text-base">{dateString}</p>
