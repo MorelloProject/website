@@ -64,7 +64,8 @@ At this point we can go to the next step.
 
 Let’s write and build our first Morello application. It will be a very simple hello world program:
 
-```
+```js
+
 // hello.c
 
 #include <stdio.h>
@@ -129,7 +130,7 @@ We're used to integer implementation of pointers when a pointer doesn't contain 
 
 Let's consider the following example:
 
-```
+```js
 // fun.c
 
 #ifndef __CHERI__
@@ -280,7 +281,7 @@ These permissions extend each other and do not work alone. For example, the `LOA
 
 Normally, you don't need to use or set permissions directly because the runtime or libraries that generate capabilities should take care of it. For example, the `malloc` function from a purecap C library would, on success, return a valid capability with appropriate bounds and permissions that should include bits that allow reading and writing data and capabilities. However, in Morello you have finer grained control over permissions of the capabilities that you work with. For example, if you want to share some data for reading with a component of your application but also want to guarantee that, whatever happens in this component, your data stays intact, you may do so by removing write permissions from the capability that you share:
 
-```
+```js
 #include <cheriintrin.h>
 ...
 char *ptr = malloc(64);
@@ -290,7 +291,7 @@ char *ro_ptr = cheri_perms_and(ptr, LOAD | LOAD_CAP | MUTABLE_LOAD);
 
 Note that our compiler will provide macros for the permission bits but for brevity we shortened their names. The macros for these shorter names may be defined like this:
 
-```
+```js
 // perms.h
 
 #pragma once
@@ -318,7 +319,7 @@ You can always rely on your programming language features to enforce read-only b
 
 Let's see how we can observe capability permissions in Morello IE and what happens when we try to do something that is not permitted. Consider the following example:
 
-```
+```sh
 char *str = calloc(64, 1);
 /* const */ char *ro_str = cheri_perms_and(str, LOAD | LOAD_CAP | MUTABLE_LOAD);
 str[0] = 'a';
@@ -382,7 +383,7 @@ A notable exception to the above is sealing with hardware object types. This can
 
 Let's consider the following example to see how a sealed capability may appear in your code.
 
-```
+```js
 // sealed.c
 
 #include <stdio.h>
@@ -467,7 +468,7 @@ We can see that it's also sealed which means it's immutable and cannot be tamper
 
 It's time to look into how the compiler manages bounds for capabilities it instantiates. For example, when we declare a local variable, what does actually happen?
 
-```
+```js
 // bounds.c
 
 #include <stdio.h>
@@ -525,7 +526,7 @@ In your case the `cstr` command may show some different contents because our mem
 
 Let's look at a more complex example:
 
-```
+```js
 // subobject.c
 
 #include <stdio.h>
@@ -555,7 +556,7 @@ $ morelloie -- ./subobject
 
 We print size of our struct which is 28 bytes (two `int`-s and one buffer of 20 bytes), seems correct. But the capability for the `data` buffer in the `my_obj_t` struct appears to be off. We can print it in Morello IE and will confirm that offset is 8 and the length is 28 instead of 20. Looks like this capability points to the `data` member but its bounds cover the entire object. So, we can do this:
 
-```
+```sh
 foo.y = 13;
 foo.data[-4] = 42;
 printf("y = %d\n", foo.y); // that's still 13, right?
@@ -715,7 +716,7 @@ In the purecap world, the nature of the `mmap` syscall (and all the related syst
 
 Typically, when you need to allocate some memory dynamically, you would use a function like `malloc`. This function should return a valid read-write capability with bounds set according to the requested size of the allocation. The permissions should allow general use for storing or loading data including pointers (capabilities). This may seem somewhat restrictive, but it is actually very much along the lines of Morello or CHERI: in most cases we don't need all the permissions, and when we do need something special, we should be explicit about it. So, if you need more control over your memory allocation properties, you may go one step deeper and use the `mmap` function.
 
-```
+```js
 // map.c
 
 #include <stdio.h>
@@ -749,7 +750,7 @@ One other important change related to Morello and described in the PCuABI spec i
 
 For example, consider a case when you want to create a memory mapping with `PROT_READ | PROT_WRITE` protection to write some executable code into it and then change its protection attributes to `PROT_READ | PROT_EXEC` by calling `mprotect`. Using `PROT_READ` and `PROT_WRITE` protection flags alone will give you a capability without the `EXECUTE` permission. Using `mprotect` later won't change your capability's permissions. That's why your first `mmap` call should use the `PROT_MAX` macro:
 
-```
+```js
 // map.c
 
 #include <stdio.h>
@@ -786,7 +787,7 @@ In terms of memory protection attributes, all three capabilities, `cap`, `cap_rw
 
 In this example, after updating the contents of the memory mapping, we can do this:
 
-```
+```bash
 mprotect(cap, 1024, PROT_READ | PROT_EXEC);
 ```
 
@@ -808,7 +809,7 @@ Here you can find a short overview of compiler builtins that may be useful when 
 
 #### Obtaining ambient capabilities
 
-```
+```js
 // Get DDC (Default Data Capability)
 // Use as "cheri_ddc_get" declared in cheriintrin.h
 void *__builtin_cheri_global_data_get();
@@ -824,7 +825,7 @@ void *__builtin_cheri_stack_get();
 
 #### Get information about a capability
 
-```
+```js
 // Get validity tag
 // Use as "cheri_tag_get" declared in cheriintrin.h
 bool __builtin_cheri_tag_get(const void *cap);
@@ -867,7 +868,7 @@ size_t __builtin_cheri_copy_from_high(const void *cap);
 
 There is no builtin for getting capability limit. You can use a combination of
 
-```
+```bash
 size_t limit = cheri_base_get(cap) + cheri_length_get(cap);
 ```
 
@@ -875,7 +876,7 @@ to achieve this.
 
 #### Modifying capabilities
 
-```
+```js
 // Set length of a capability (may result in bigger length than requested
 // if the latter is not representable)
 // Use as "cheri_bounds_set" declared in cheriintrin.h
@@ -921,7 +922,7 @@ void *__builtin_cheri_cap_from_pointer(const void *cap, size_t address);
 
 One notable use case is worth looking at: create a capability with given length with some required offset (i.e., given bounds) from a source capability that potentially has larger bounds. Consider the following example:
 
-```
+```c
 #include <stdio.h>
 #include <cheriintrin.h>
 
@@ -941,7 +942,7 @@ It is also important to understand difference between the `__builtin_cheri_addre
 
 #### Sealing and unsealing capabilities
 
-```
+```c
 // Seal function pointer (creating a sentry)
 // On Morello, this creates RB-sealed capability.
 // Use as "cheri_sentry_create" declared in cheriintrin.h
@@ -966,7 +967,7 @@ void *__builtin_cheri_cap_type_copy(const void *cap, const void *otype);
 
 Note: there is no builtin for LPB and LB object types, you will need to use inline assembly for this:
 
-```
+```c
 inline __attribute__ ((naked))
 void *__morello_seal_lpb(void *cap)
 {
@@ -986,7 +987,7 @@ void *__morello_seal_lb(void *cap)
 
 #### Compare capabilities
 
-```
+```c
 // Check if two capabilities are equal (have the same bit encoding)
 // Use as "cheri_is_equal_exact" declared in cheriintrin.h
 bool __builtin_cheri_equal_exact(const void *lhs, const void *rhs)
@@ -999,7 +1000,7 @@ bool __builtin_cheri_subset_test(const void *subcap, const void *cap);
 
 #### Operations for bounds representability
 
-```
+```c
 // Round capability length to representable value
 // Use as "cheri_representable_length" declared in cheriintrin.h
 size_t __builtin_cheri_round_representable_length(size_t length);
@@ -1011,7 +1012,7 @@ size_t __builtin_cheri_representable_alignment_mask(size_t length);
 
 #### Miscellaneous
 
-```
+```c
 // Load 4 capability tags for consecutive capabilities in memory
 // pointed to by the given capability (must be 64 bytes aligned)
 // Use as "cheri_tags_load" declared in cheriintrin.h

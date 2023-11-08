@@ -14,13 +14,13 @@ import ExampleModel from "../../components/resources/CheriseedPortEffortlesslyTo
 
 <Navigation />
 
-# CHERI - Overview
+### CHERI - Overview
 
 Current CPU architectures require strong software support for memory and address-space management, increasing the overhead and complexity to make systems more secure. Preventing, or even just mitigating, exploitation of software bugs in the systems results in inefficient and increasingly expensive software support.
 
 CHERI-based architecture introduces hardware-supported security features using explicit capability model with bounded memory access and additional properties to limit unauthorized memory exploitations. All memory within an address space in such an architecture can be accessed via one of two kinds of capabilities, with one of the types used in load/store instructions to access data or other capabilities, and the other one - for transition between protection domains via invoking call/return instructions[^ref1] [^ref2]. To find out more about memory protection, check this [post](/resources/how-morello-prevents-buffer-overreads-on-example-of-libjpeg-turbo-cve-2018-19664/).
 
-# CHERIseed – Introduction
+### CHERIseed – Introduction
 
 While CHERI introduces strong security features, it also requires tweaking the programming model to ensure capability provenance validity, monotonicity and to resolve other capability related faults. So, migrating your project to enable the use of the CHERI features could be a bit tedious. To overcome this deterrence and to facilitate the porting effort of existing code to CHERI hardware platform we are introducing CHERIseed.
 
@@ -32,7 +32,7 @@ CHERIseed is a software-only implementation of CHERI C/C++ semantics[^ref3]. It 
 
 CHERIseed is a semantic implementation of CHERI C/C++ which provides developers that have access to widely used architectures to modify their codebase and add support for CHERI. Hence, CHERIseed does not emulate CHERI hardware, it uses a third-party library to encode/decode capabilities. CHERIseed does not provide similar security guarantees as CHERI hardware and should not be used as a replacement security enforcing tool. This tool includes features to detect CHERI violations like untagged, out-of-bounds access and invalid permission violations, and provides detailed description of these faults for efficient debugging of the ported software - for details, refer [CHERIseed.rst](https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/docs/CHERIseed.rst). Because of the nature of code instrumentation, CHERIseed does not provide any performance advantage over the real hardware and should not be used for performance benchmarking.
 
-# Bringing CHERIseed to your Project
+### Bringing CHERIseed to your Project
 
 This section explores the use of CHERIseed by demonstrating how it displays a CHERI violation and how it helps to fix a bug. A simple example, which runs without issues, produces a capability violation when compiled with CHERIseed enabled, revealing a bug. Currently, CHERIseed allows to build and run static and dynamically linked applications on `aarch64` or `x86` machines. See [CHERI C/C++ Programming Guide](https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-947.pdf), for more details.
 
@@ -45,7 +45,7 @@ This section explores the use of CHERIseed by demonstrating how it displays a CH
 Check the <a data-toggle="modal" data-target="#buildModal">musl-libc build</a> to see how to setup the environment to build CHERIseed on your machine.
 Compile `string.c` on the host machine using the flags `-fsanitize=cheriseed` to enable CHERIseed and `-cheri-bounds=subobject-safe` to enable enforcements on C-language objects within allocations.
 
-```bash
+```c
 '$> ${CC} \
   --target=${TARGET_TRIPLE} \
 -rtlib=compiler-rt \
@@ -115,7 +115,7 @@ The address space of CHERI is 128-bit (on 64-bit host) and CHERIseed abstracts c
 
 Now we have successfully compiled the source with CHERIseed. Run the program and use `gdb` to inspect the issue.
 
-```
+```c
 (gdb) run
 Starting program: /home/cheriseed-workspace/string.bin
 
@@ -145,7 +145,7 @@ We have encountered CHERIseed runtime error specifying which CHERI violation is 
 
 Following is an overview of how we represent a capability string.
 
-```
+```c
 <address> [<permissions>,<base>-<top>] (<attr>)
 ```
 
@@ -154,7 +154,7 @@ To read more about the capability string representation used, see [Display Capab
 <CodeLayout>
 <div class="card-header p-6">Note</div>
 <div class='p-6'>
-```
+```sh
 (gdb) x/2xg 0x77fff7febb60
 0x77fff7febb60: 0x0000002050db 0x000000000000
 (gdb) x/s 0x0000002050db
@@ -172,7 +172,7 @@ Inspecting the CHERIseed error message further, we see a `SIGSEGV` is raised bec
 
 Furthermore, we can choose how CHERIseed should behave when it encounters semantic rule violations, i.e., it is possible to configure which checks are disabled at compile time (using compiler flags) or at runtime (using APIs or environment variables). For compile-time configuration of the checks, use the clang option `-fsanitize-cheriseed-checks` with a valid value string - compile-time configuration of the checks can be different per source module. For our case, let us try runtime configuration to enable all but tag checks using environment variable `CHERISEED_CHECKS` which controls how CHERIseed behaves without the need to recompile the application.
 
-```
+```c
 (gdb) set environment CHERISEED_CHECKS=-TAG
 (gdb) run
 Starting program: /home/cheriseed-workspace/string.bin
@@ -209,7 +209,7 @@ Alternatively, we can use `__cheriseed_control_checks()` API for runtime checks.
 
 Printing the stack trace,
 
-```
+```c
 (gdb) where
 #0 0x000000000023309a in morello::shim::svc_impl () at src/svc.cpp:54
 #1 0x000000000023301a in morello::shim::svc (arg1=..., arg2=..., arg3=..., arg4=..., arg5=..., arg6=..., nr=&lt;optimised out&gt;, cg=...) at src/svc.cpp:183
@@ -232,8 +232,7 @@ Because of how CHERIseed handles runtime calls, in backtrace we can see extra it
 
 Running the program again gives the following output.
 
-```
-
+```c
 (gdb) run
 Starting program: /home/cheriseed-workspace/string.bin
 
@@ -299,7 +298,7 @@ Finally, we have the source running successfully using CHERIseed and we can say 
   </div>
 </CodeLayout>
 
-# Other Examples
+### Other Examples
 
 <p class="flex flex-row">
 
@@ -307,7 +306,7 @@ Finally, we have the source running successfully using CHERIseed and we can say 
  
 </p>
 
-# Limitations
+### Limitations
 
 As mentioned in the introduction, CHERIseed should not be considered a replacement for hardware-enforced CHERI. Also, CHERIseed considers inline assembly snippets as “unsafe” because it cannot reason about what happens in the assembly. However, some forms of inline assembly are considered safe: compiler barriers and those which don’t take or return pointers. Some workarounds for these may include the use of compiler builtins, etc. to replace assembly with C/C++ code.
 Also, CHERIseed does not have support for the following currently (the list is not exhaustive) and these could be great additions:
@@ -320,7 +319,7 @@ CHERIseed is still in its alpha phase. We successfully used CHERIseed to debug C
 
 For more details regarding CHERIseed limitations, <a href='https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/docs/CHERIseed.rst'>CHERIseed.rst</a>.
 
-# Inviting You to Collaborate and Contribute
+### Inviting You to Collaborate and Contribute
 
 Thank you for your interest in CHERIseed. It still needs work to make it robust and we are inviting you to try it, share your feedback, request a feature, or contribute to the code if you have time. To get started with contributing to code, please read testing and other submission guidelines as mentioned in <a href='https://git.morello-project.org/morello/llvm-project/-/blob/cheriseed/clang/docs/CHERIseed.rst'>CHERIseed contribute. </a>
 
@@ -328,7 +327,7 @@ To file a ticket at issues tracker, follow <a href='https://git.morello-project.
 
 _Copyright © 2022, Arm Ltd._
 
-# References
+### References
 
 [^ref1]: University of Cambridge, Computer Laboratory, 2014, Capability Hardware Enhanced RISC Instructions: CHERI Instruction-set architecture, Abstract, viewed October 2022 <a href='https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-850.pdf'>https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-850.pdf</a>
 [^ref2]: University of Cambridge, Computer Laboratory, 2020, Capability Hardware Enhanced RISC Instructions: CHERI Instruction-Set Architecture (Version 8), Chapter 2.4.5 “Source-Code and Binary Compatibility” viewed June 2021 <a href='https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.pdf'>https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.pdf</a>

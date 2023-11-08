@@ -1,6 +1,7 @@
 ---
 author: arm
 title: Capinfo
+description: We'd like to announce the release of the Capinfo tool. Morello capabilities hold a lot of information, compressed into a fairly small number of bits, and decoding them manually (e.g. whilst debugging) is non-trivial.
 date: 2021-09-17 09:00:00
 category: resources
 image: ../../assets/images/content/capinfo-thumb.png

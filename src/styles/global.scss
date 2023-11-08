@@ -133,3 +133,123 @@ div#capinfo input.error {
   z-index: -1;
   height: 350px;
 }
+
+.md-content {
+  word-wrap: break-word;
+
+  .developer {
+    @media screen and (max-width: 788px) {
+      overflow-x: auto;
+      // white-space: nowrap;
+    }
+  }
+
+  p {
+    font-size: 20px;
+  }
+  a {
+    color: #ffa409;
+    text-decoration: none;
+  }
+  ul {
+    list-style-type: disc;
+    margin-bottom: 20px;
+    li::marker {
+      // font-size: x-large;
+      color: black;
+    }
+  }
+
+  .copy-code {
+    padding: 0 !important;
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    align-items: right;
+
+    img {
+      width: 20px;
+      color: white;
+      background-color: #ededed;
+      transition: background-color 0.3s ease;
+      // position: relative;
+      // z-index: 9999;
+    }
+    img:hover {
+      background-color: #ffa409;
+    }
+  }
+
+  blockquote {
+    background-color: #ededed;
+    border-left: 8px solid #00b1df;
+    color: #555555;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    padding: 15px;
+    margin-left: 20px;
+    font-style: italic !important;
+    font-size: 20px;
+    width: 100%;
+    @media screen and (max-width: 788px) {
+      margin-left: auto;
+      margin-right: auto;
+      padding: 3px;
+    }
+
+    .signed-off {
+      background-color: black;
+      color: white;
+    }
+
+    div.content-wrapper {
+      display: flex;
+      flex: 1;
+      align-items: flex-start;
+    }
+
+    pre {
+      flex: 1;
+      background-color: black;
+      padding: 20px;
+      margin-left: 10px;
+      position: relative;
+      align-items: center;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+
+      @media screen and (max-width: 788px) {
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .copy-code {
+        padding: 0 !important;
+        width: 100%;
+        display: flex;
+        justify-content: right;
+        align-items: right;
+
+        img {
+          width: 20px;
+          color: white;
+          background-color: #ededed;
+          transition: background-color 0.3s ease;
+        }
+        img:hover {
+          background-color: #ffa409;
+        }
+      }
+    }
+    code {
+      background-color: black;
+      color: white;
+      padding: 10px;
+      width: 100% !important;
+      margin-left: 5px;
+    }
+  }
+}

@@ -13,7 +13,7 @@ const dateString = dateObj.format("dddd, MMMM D, YYYY");
   class="card mt-16 w-full lg:max-w-full flex flex-col lg:flex-row-reverse mx-auto justify-center"
 >
   <div
-    class="opacity-100 rounded-tr-3xl rounded-tl-3xl lg:rounded-tl-none lg:rounded-tr-3xl lg:rounded-br-3xl h-48 lg:h-auto lg:w-2/3 flex-none bg-cover text-center overflow-hidden card-image"
+    class="opacity-100 rounded-tr-3xl rounded-tl-3xl lg:rounded-tl-none lg:rounded-tr-3xl lg:rounded-br-3xl h-48 lg:h-auto w-full lg:w-2/3 flex-none bg-cover text-center overflow-hidden card-image"
     style={{ backgroundImage: `url(${resource.data.image.src})` }}
     title="Woman holding a mug"
   >
@@ -22,15 +22,15 @@ const dateString = dateObj.format("dddd, MMMM D, YYYY");
     class="lg:w-1/3 rounded-br-3xl rounded-bl-3xl lg:rounded-tl-3xl lg:rounded-bl-3xl border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col leading-normal card-content"
   >
     <div class="flex flex-row justify-between">
-      <p class="mt-8">{resource.data.author.toUpperCase()}</p>
+      <p class="mt-8 italic">{resource.data.author.toUpperCase()}</p>
       <Image style="width:50px" alt="arm logo" src={armLogo} />
     </div>
-    <h3 class="font-normal">{resource.data.title}</h3>
-    <p class="text-[#6c757d] text-base">{dateString}</p>
-    <p>{resource.data.description}</p>
+    <div class="font-normal text-xl">{resource.data.title}</div>
+    <div class="text-[#6c757d] text-base">{dateString}</div>
+    <div class="text-xl">{resource.data.description}</div>
     <a
       href={`/resources/${resource.slug}`}
-      class="text-white !important bg-[#273548] p-2 w-20 rounded text-center whiteColor"
+      class="text-white !important bg-[#273548] p-2 w-20 mt-4 rounded text-center whiteColor hover:underline"
       >Read</a
     >
   </div>

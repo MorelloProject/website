@@ -13,7 +13,9 @@ const resourceLists = resources
 
 <div class="container max-w-7xl mx-auto p-4">
   <ul class="">
-    <div class=""><FirstItem resource={resourceLists[0]} /></div>
+    <div class="flex mx-auto">
+      <FirstItem resource={resourceLists[0]} />
+    </div>
     <div class="grid grid-cols-1 mb-4 md:grid-cols-2 lg:grid-cols-3 gap-y-12">
       {
         resourceLists
